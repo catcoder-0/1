@@ -139,16 +139,59 @@
 
     * { box-sizing: border-box; }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     html, body { margin: 0; min-height: 100%; }
 
     body {
+      --gaze-x: 50%;
+      --gaze-y: 30%;
+      --scroll-y: 0;
       min-height: 100vh;
       color: var(--ink);
       font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       background:
+        radial-gradient(ellipse 42% 34% at var(--gaze-x) var(--gaze-y), color-mix(in srgb, var(--gold) 18%, transparent), transparent 70%),
+        radial-gradient(ellipse 58% 42% at 18% 12%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 62%),
         radial-gradient(ellipse 70% 48% at var(--spot-x) var(--spot-y), var(--wash-1) 0%, transparent 58%),
         radial-gradient(ellipse 46% 36% at var(--spot2-x) var(--spot2-y), var(--wash-2) 0%, transparent 68%),
         linear-gradient(var(--bg-angle), var(--wash-3) 0%, var(--wash-4) 48%, var(--wash-5) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--gold) 22%, transparent) 1px, transparent 0);
+      background-size: 26px 26px;
+      opacity: 0.28;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+      transform: translate3d(0, calc(var(--scroll-y) * -0.04px), 0);
+      will-change: transform;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 45% at var(--gaze-x) var(--gaze-y), transparent 0%, transparent 42%, color-mix(in srgb, var(--wash-5) 28%, transparent) 100%),
+        linear-gradient(180deg, color-mix(in srgb, var(--wash-5) 18%, transparent), transparent 18%, transparent 78%, color-mix(in srgb, var(--wash-5) 34%, transparent));
+      opacity: 0.55;
+      transition: opacity 0.4s ease;
+    }
+
+    body.article-open::after {
+      opacity: 0.82;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 42%, transparent 0%, transparent 48%, color-mix(in srgb, var(--wash-5) 42%, transparent) 100%),
+        linear-gradient(180deg, color-mix(in srgb, var(--wash-5) 28%, transparent), transparent 14%, transparent 82%, color-mix(in srgb, var(--wash-5) 48%, transparent));
     }
 
     [data-theme="read"] body {
@@ -161,106 +204,183 @@
     html.has-cursor, html.has-cursor * { cursor: none !important; }
 
     .stage {
+      position: relative;
+      z-index: 3;
       min-height: 100vh;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      gap: 22px;
-      padding: 118px 132px 140px 72px;
+      gap: 26px;
+      padding: 108px 96px 160px 72px;
+      transition: padding 0.35s ease, gap 0.35s ease;
+    }
+
+    body.article-open .stage {
+      gap: 18px;
+      padding-top: 96px;
+      padding-bottom: 120px;
     }
 
     .topbar {
       position: fixed;
-      top: 10px;
-      left: 50%;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 80;
-      transform: translateX(-50%);
-      width: min(1080px, calc(100% - 32px));
-      min-height: 52px;
+      width: 100%;
+      min-height: 62px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 8px 14px;
-      border-radius: 18px;
-      background: color-mix(in srgb, #f7f4ee 82%, transparent);
-      color: #7c3aed;
+      gap: 18px;
+      padding: 8px 28px;
+      border-radius: 0;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 10%, transparent), transparent 62%),
+        color-mix(in srgb, var(--dock) 86%, transparent);
+      color: var(--dock-ink);
       box-shadow:
-        0 10px 28px rgba(90, 70, 40, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.55);
-      backdrop-filter: blur(16px) saturate(1.2);
-      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+        0 10px 28px color-mix(in srgb, var(--gold) 12%, transparent),
+        inset 0 -1px 0 color-mix(in srgb, var(--gold) 28%, transparent);
+      backdrop-filter: blur(18px) saturate(1.18);
+      -webkit-backdrop-filter: blur(18px) saturate(1.18);
       font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-      overflow-x: auto;
+      transition:
+        min-height 0.28s ease,
+        padding 0.28s ease,
+        background 0.28s ease,
+        box-shadow 0.28s ease,
+        transform 0.28s ease;
+    }
+
+    .topbar.is-compact {
+      min-height: 50px;
+      padding: 4px 24px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
+        color-mix(in srgb, var(--dock) 78%, transparent);
+      box-shadow:
+        0 6px 18px color-mix(in srgb, var(--gold) 10%, transparent),
+        inset 0 -1px 0 color-mix(in srgb, var(--gold) 22%, transparent);
+    }
+
+    body.article-open .topbar {
+      transform: translateY(-8px);
+      opacity: 0.92;
+    }
+
+    body.article-open .topbar:hover,
+    body.article-open .topbar:focus-within {
+      transform: none;
+      opacity: 1;
     }
 
     [data-theme="dark"] .topbar {
-      background: color-mix(in srgb, #1c212c 84%, transparent);
-      color: #c4b5fd;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 12%, transparent), transparent 70%),
+        color-mix(in srgb, #1c212c 90%, transparent);
       box-shadow:
-        0 10px 28px rgba(0, 0, 0, 0.35),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+        0 10px 28px rgba(0, 0, 0, 0.32),
+        inset 0 -1px 0 color-mix(in srgb, var(--gold) 22%, transparent);
+    }
+
+    .topbar-brand {
+      position: absolute;
+      left: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: color-mix(in srgb, var(--gold) 55%, var(--dock-ink));
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      white-space: nowrap;
+    }
+
+    .topbar-brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      object-fit: cover;
+      box-shadow: 0 4px 10px color-mix(in srgb, var(--gold) 22%, transparent);
     }
 
     .topbar-nav {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 6px;
       margin: 0 auto;
+      padding: 4px;
       width: max-content;
+      max-width: calc(100% - 32px);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--dock-ink) 4%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
+      overflow-x: auto;
     }
 
     .topbar-link {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       border: 0;
-      padding: 7px 10px;
-      border-radius: 12px;
+      padding: 6px 12px 6px 7px;
+      border-radius: 999px;
       background: transparent;
       color: inherit;
       font: inherit;
       font-size: 13px;
       font-weight: 650;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.06em;
       text-decoration: none;
       white-space: nowrap;
-      text-shadow: 0 0 10px color-mix(in srgb, #a78bfa 45%, transparent);
       transform: translateY(0) scale(1);
       transition:
-        background 0.2s ease,
-        transform 0.22s cubic-bezier(0.22, 0.8, 0.28, 1),
+        background 0.22s ease,
+        transform 0.28s cubic-bezier(0.22, 1.4, 0.32, 1),
         box-shadow 0.22s ease,
-        filter 0.2s ease;
+        color 0.2s ease;
+    }
+
+    .topbar-link img {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      display: block;
+      object-fit: contain;
+      border-radius: 7px;
+      background: color-mix(in srgb, var(--gold) 10%, transparent);
+      transition: transform 0.32s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     .topbar-link:hover,
     .topbar-link:focus-visible {
-      background: color-mix(in srgb, #a78bfa 14%, transparent);
+      background: color-mix(in srgb, var(--gold) 16%, transparent);
+      color: color-mix(in srgb, var(--gold) 42%, var(--dock-ink));
       outline: none;
-      transform: translateY(-2px) scale(1.03);
-      box-shadow: 0 8px 18px color-mix(in srgb, #7c3aed 16%, transparent);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 18px color-mix(in srgb, var(--gold) 22%, transparent);
     }
 
     .topbar-link:active {
       transform: translateY(0) scale(0.96);
-      filter: brightness(0.98);
       transition-duration: 0.08s;
     }
 
-    .topbar-link svg {
-      width: 16px;
-      height: 16px;
-      flex: none;
-      display: block;
-      transition: transform 0.22s cubic-bezier(0.22, 0.8, 0.28, 1);
+    .topbar-link.is-active {
+      background: color-mix(in srgb, var(--gold) 22%, transparent);
+      color: color-mix(in srgb, var(--gold) 55%, var(--dock-ink));
+      box-shadow:
+        0 8px 16px color-mix(in srgb, var(--gold) 18%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 28%, transparent);
     }
 
-    .topbar-link:hover svg,
-    .topbar-link:focus-visible svg {
-      transform: translateY(-1px) scale(1.08);
+    .topbar-link:hover img,
+    .topbar-link:focus-visible img,
+    .topbar-link.is-active img {
+      transform: translateY(-2px) rotate(-8deg) scale(1.14);
     }
 
     .read-progress {
@@ -272,6 +392,12 @@
       height: 3px;
       pointer-events: none;
       background: color-mix(in srgb, var(--dock-ink) 8%, transparent);
+      transition: height 0.25s ease, opacity 0.25s ease;
+    }
+
+    body.article-open .read-progress {
+      height: 4px;
+      background: color-mix(in srgb, var(--dock-ink) 12%, transparent);
     }
 
     .read-progress > span {
@@ -280,9 +406,16 @@
       width: 100%;
       transform-origin: left center;
       transform: scaleX(0);
-      background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+      background: linear-gradient(90deg, var(--gold), var(--gold-bright), var(--gold));
+      background-size: 200% 100%;
       box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 45%, transparent);
       transition: transform 0.08s linear;
+      animation: progress-shimmer 2.8s linear infinite;
+    }
+
+    @keyframes progress-shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
     }
 
     .cursor-dust {
@@ -297,14 +430,15 @@
       position: absolute;
       left: 0;
       top: 0;
-      width: 4px;
-      height: 4px;
-      margin: -2px 0 0 -2px;
+      width: 5px;
+      height: 5px;
+      margin: -2.5px 0 0 -2.5px;
       border-radius: 50%;
-      background: radial-gradient(circle, var(--gold-bright) 0%, var(--gold) 55%, transparent 72%);
+      background: radial-gradient(circle, #fff8e4 0%, var(--gold-bright) 38%, var(--gold) 70%, transparent 78%);
       opacity: 0;
       pointer-events: none;
       contain: layout style;
+      box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 50%, transparent);
     }
 
     .cursor-dust i.is-gem {
@@ -326,40 +460,74 @@
 
     .board {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 252px;
-      gap: 20px;
+      grid-template-columns: minmax(0, 1fr) 268px;
+      gap: 24px;
       width: 100%;
-      max-width: 980px;
+      max-width: 1040px;
       margin: 0 auto;
       align-items: start;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .board-side {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 24px;
-      background: color-mix(in srgb, var(--dock) 94%, transparent);
+      gap: 10px;
+      padding: 12px 12px 14px;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--gold) 22%, transparent), transparent 46%),
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 40%),
+        color-mix(in srgb, var(--dock) 92%, transparent);
       color: var(--dock-ink);
-      box-shadow: var(--dock-shadow);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      box-shadow:
+        var(--dock-shadow),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 24%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 36%, transparent);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
       position: sticky;
       top: 78px;
     }
 
+    [data-theme="dark"] .board-side {
+      background:
+        radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 50%),
+        color-mix(in srgb, #1c212c 90%, transparent);
+    }
+
     .side-block {
+      position: relative;
       padding: 12px;
       border-radius: 18px;
       background: color-mix(in srgb, var(--dock-ink) 4%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 10%, transparent);
+      transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+    }
+
+    .side-block:hover {
+      background: color-mix(in srgb, var(--gold) 7%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent);
     }
 
     .side-label {
-      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
       font-size: 11px;
-      letter-spacing: 0.18em;
+      font-weight: 700;
+      letter-spacing: 0.16em;
       color: var(--gold);
+    }
+
+    .side-label img {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--gold) 28%, transparent));
     }
 
     .side-links {
@@ -369,27 +537,37 @@
     }
 
     .side-link {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --tilt-lift: 0px;
       display: grid;
       place-items: center;
-      gap: 4px;
-      min-height: 58px;
-      padding: 8px 4px;
-      border-radius: 14px;
+      gap: 6px;
+      min-height: 72px;
+      padding: 10px 4px 8px;
+      border-radius: 16px;
       color: inherit;
       text-decoration: none;
-      background: color-mix(in srgb, var(--dock) 88%, transparent);
-      box-shadow: 0 1px 0 color-mix(in srgb, var(--dock-ink) 6%, transparent);
-      transform: translateY(0) scale(1);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 10%, transparent), transparent 58%),
+        color-mix(in srgb, var(--dock) 82%, transparent);
+      box-shadow:
+        0 8px 16px color-mix(in srgb, var(--dock-ink) 6%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 14%, transparent);
+      transform: perspective(700px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift)) scale(1);
       transition:
-        transform 0.22s cubic-bezier(0.22, 0.8, 0.28, 1),
+        transform 0.18s ease,
         background 0.2s ease,
         box-shadow 0.22s ease;
     }
 
     .side-link:hover {
-      transform: translateY(-3px) scale(1.04);
-      background: color-mix(in srgb, var(--gold) 14%, var(--dock));
-      box-shadow: 0 10px 18px color-mix(in srgb, var(--dock-ink) 10%, transparent);
+      --tilt-lift: -4px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 18%, transparent), transparent 58%),
+        color-mix(in srgb, var(--gold) 12%, var(--dock));
+      box-shadow: 0 14px 22px color-mix(in srgb, var(--gold) 22%, transparent);
+      transform: perspective(700px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift)) scale(1.05);
     }
 
     .side-link:active {
@@ -399,21 +577,24 @@
 
     .side-link img {
       display: block;
-      width: 22px;
-      height: 22px;
+      width: 28px;
+      height: 28px;
       object-fit: contain;
-      border-radius: 5px;
-      transition: transform 0.22s cubic-bezier(0.22, 0.8, 0.28, 1);
+      padding: 4px;
+      border-radius: 10px;
+      background: color-mix(in srgb, #fff 72%, var(--gold));
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 18%, transparent);
+      transition: transform 0.32s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     .side-link:hover img {
-      transform: scale(1.1);
+      transform: rotate(-8deg) scale(1.12);
     }
 
     .side-link span {
       font-size: 11px;
       letter-spacing: 0.04em;
-      opacity: 0.78;
+      opacity: 0.82;
     }
 
     .calendar {
@@ -446,11 +627,21 @@
       background: transparent;
       color: inherit;
       opacity: 0.55;
+      transition: opacity 0.16s ease, background 0.16s ease, transform 0.18s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     .calendar-head button:hover {
       opacity: 1;
       background: color-mix(in srgb, var(--gold) 16%, transparent);
+      transform: scale(1.08);
+    }
+
+    .calendar-head button img {
+      width: 14px;
+      height: 14px;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
     }
 
     .calendar-week,
@@ -468,6 +659,14 @@
       padding: 4px 0;
     }
 
+    .calendar-head button img {
+      width: 14px;
+      height: 14px;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
     .calendar-days button {
       height: 28px;
       border: 0;
@@ -478,6 +677,12 @@
       font: inherit;
       font-size: 12px;
       font-variant-numeric: tabular-nums;
+      transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    }
+
+    .calendar-days button:hover {
+      background: color-mix(in srgb, var(--gold) 16%, transparent);
+      transform: scale(1.08);
     }
 
     .calendar-days button.is-muted {
@@ -497,47 +702,85 @@
       align-items: center;
     }
 
+    .side-search-field {
+      position: relative;
+      min-width: 0;
+    }
+
+    .side-search-field img {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      margin-top: -8px;
+      object-fit: contain;
+      pointer-events: none;
+      opacity: 0.78;
+    }
+
     .side-search input {
       width: 100%;
       min-width: 0;
-      height: 34px;
+      height: 36px;
       border: 0;
       border-radius: 12px;
-      padding: 0 12px;
+      padding: 0 10px 0 30px;
       background: color-mix(in srgb, var(--dock) 90%, transparent);
       color: inherit;
       font: inherit;
       font-size: 13px;
       letter-spacing: 0.04em;
       outline: none;
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dock-ink) 8%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
+      transition: box-shadow 0.18s ease, background 0.18s ease;
     }
 
     .side-search input:focus {
+      background: color-mix(in srgb, var(--gold) 8%, var(--dock));
       box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--gold) 70%, transparent);
     }
 
     .side-search button {
-      height: 34px;
+      height: 36px;
       border: 0;
       border-radius: 12px;
-      padding: 0 12px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       background: color-mix(in srgb, var(--dock-ink) 7%, transparent);
       color: inherit;
       font: inherit;
       font-size: 12px;
       letter-spacing: 0.06em;
       white-space: nowrap;
+      transform: translateY(0) scale(1);
+      transition: transform 0.22s cubic-bezier(0.22, 1.4, 0.32, 1), filter 0.16s ease, box-shadow 0.2s ease;
+    }
+
+    .side-search button img {
+      width: 14px;
+      height: 14px;
+      display: block;
+      object-fit: contain;
     }
 
     .side-search button.is-primary {
       background: var(--gold);
       color: #1c1914;
       font-weight: 650;
+      box-shadow: 0 6px 14px color-mix(in srgb, var(--gold) 28%, transparent);
     }
 
     .side-search button:hover {
-      filter: brightness(1.03);
+      filter: brightness(1.05);
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .side-search button:active {
+      transform: translateY(0) scale(0.96);
+      transition-duration: 0.08s;
     }
 
     .article-item.is-hidden {
@@ -554,7 +797,9 @@
     }
 
     .side-latest a {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       padding: 8px 10px;
       border-radius: 12px;
       color: inherit;
@@ -562,14 +807,29 @@
       font-size: 13px;
       line-height: 1.45;
       letter-spacing: 0.04em;
-      opacity: 0.82;
-      transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+      opacity: 0.86;
+      transition: background 0.16s ease, color 0.16s ease, opacity 0.16s ease, transform 0.18s ease;
+    }
+
+    .side-latest a img {
+      width: 16px;
+      height: 16px;
+      flex: none;
+      object-fit: contain;
+    }
+
+    .side-latest a span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .side-latest a:hover {
       opacity: 1;
       color: var(--gold);
       background: color-mix(in srgb, var(--gold) 12%, transparent);
+      transform: translateX(3px);
     }
 
     .side-tags {
@@ -968,11 +1228,17 @@
 
     .board-main {
       min-width: 0;
-      border-radius: 24px;
-      background: color-mix(in srgb, var(--dock) 92%, transparent);
-      box-shadow: var(--dock-shadow);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 46%),
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 6%, transparent), transparent 40%),
+        color-mix(in srgb, var(--dock) 92%, transparent);
+      box-shadow:
+        var(--dock-shadow),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 34%, transparent);
+      backdrop-filter: blur(18px) saturate(1.16);
+      -webkit-backdrop-filter: blur(18px) saturate(1.16);
       padding: 22px 26px 28px;
       color: var(--dock-ink);
     }
@@ -984,14 +1250,16 @@
       gap: 12px;
       margin-bottom: 18px;
       padding-bottom: 14px;
-      border-bottom: 1px solid color-mix(in srgb, var(--dock-ink) 10%, transparent);
+      border-bottom: 1px solid color-mix(in srgb, var(--gold) 20%, transparent);
     }
 
     .board-title {
       margin: 0;
-      font-size: 18px;
-      font-weight: 650;
-      letter-spacing: 0.14em;
+      font-size: 20px;
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      color: color-mix(in srgb, var(--gold) 42%, var(--dock-ink));
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
     }
 
     .board-actions {
@@ -1001,6 +1269,8 @@
     }
 
     .board-action {
+      position: relative;
+      overflow: hidden;
       height: 32px;
       border: 0;
       border-radius: 999px;
@@ -1014,10 +1284,23 @@
       transform: translateY(0) scale(1);
       box-shadow: 0 4px 12px color-mix(in srgb, var(--gold) 28%, transparent);
       transition:
-        transform 0.22s cubic-bezier(0.22, 0.8, 0.28, 1),
+        transform 0.28s cubic-bezier(0.22, 1.4, 0.32, 1),
         filter 0.2s ease,
         box-shadow 0.22s ease,
         background 0.2s ease;
+    }
+
+    .board-action::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 35%, rgba(255, 248, 232, 0.55) 50%, transparent 65%);
+      transform: translateX(-120%);
+      pointer-events: none;
+    }
+
+    .board-action:hover::after {
+      animation: btn-sheen 0.7s ease;
     }
 
     .board-action.is-ghost {
@@ -1028,18 +1311,18 @@
     }
 
     .board-action:hover {
-      transform: translateY(-2px) scale(1.03);
-      filter: brightness(1.04);
-      box-shadow: 0 10px 20px color-mix(in srgb, var(--gold) 36%, transparent);
+      transform: translateY(-3px) scale(1.05);
+      filter: brightness(1.05);
+      box-shadow: 0 12px 22px color-mix(in srgb, var(--gold) 40%, transparent);
     }
 
     .board-action.is-ghost:hover {
-      background: color-mix(in srgb, var(--dock-ink) 12%, transparent);
-      box-shadow: 0 8px 16px color-mix(in srgb, var(--dock-ink) 10%, transparent);
+      background: color-mix(in srgb, var(--gold) 14%, transparent);
+      box-shadow: 0 8px 16px color-mix(in srgb, var(--gold) 16%, transparent);
     }
 
     .board-action:active {
-      transform: translateY(0) scale(0.95);
+      transform: translateY(0) scale(0.94);
       filter: brightness(0.97);
       transition-duration: 0.08s;
     }
@@ -1054,7 +1337,7 @@
     .article-list {
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 10px;
       margin: 0;
       padding: 0;
       list-style: none;
@@ -1069,25 +1352,53 @@
     }
 
     .article-item {
-      padding: 16px 4px;
-      border-bottom: 1px solid color-mix(in srgb, var(--dock-ink) 8%, transparent);
+      padding: 0;
+      border-bottom: 0;
     }
 
     .article-item:last-child {
       border-bottom: 0;
-      padding-bottom: 4px;
+      padding-bottom: 0;
     }
 
     .article-item-card {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --tilt-lift: 0px;
       display: block;
       width: 100%;
       border: 0;
-      padding: 0;
-      background: transparent;
+      padding: 16px 16px 14px;
+      margin: 0;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
+        color-mix(in srgb, var(--dock-ink) 3%, transparent);
       color: inherit;
       font: inherit;
       text-align: left;
       cursor: pointer;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 12%, transparent);
+      transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift));
+      transition:
+        background 0.22s ease,
+        transform 0.18s ease,
+        box-shadow 0.22s ease;
+    }
+
+    .article-item-card:hover {
+      --tilt-lift: -4px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 16%, transparent), transparent 70%),
+        color-mix(in srgb, var(--gold) 8%, transparent);
+      box-shadow:
+        0 14px 24px color-mix(in srgb, var(--gold) 16%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 28%, transparent);
+    }
+
+    .article-item-card:active {
+      --tilt-lift: 0px;
+      transform: perspective(900px) scale(0.985);
     }
 
     .article-item-card:hover .article-title {
@@ -1097,18 +1408,26 @@
     .article-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 14px;
+      gap: 8px;
       margin: 0 0 8px;
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 0.06em;
-      opacity: 0.5;
+      opacity: 1;
+    }
+
+    .article-meta span {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--gold) 12%, transparent);
+      color: color-mix(in srgb, var(--gold) 40%, var(--dock-ink));
+      opacity: 0.9;
     }
 
     .article-title {
       margin: 0;
       font-size: 17px;
-      font-weight: 650;
-      letter-spacing: 0.06em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       line-height: 1.4;
       transition: color 0.16s ease;
     }
@@ -1150,39 +1469,39 @@
 
     .cat-ui {
       position: fixed;
-      left: 12px;
-      bottom: 164px;
+      left: 16px;
+      bottom: 188px;
       z-index: 38;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 12px;
+      gap: 14px;
       pointer-events: none;
     }
 
     .cat-bubble {
       position: relative;
-      max-width: 176px;
-      min-width: 100px;
-      padding: 10px 14px;
-      border-radius: 16px 16px 16px 8px;
+      max-width: 196px;
+      min-width: 108px;
+      padding: 11px 15px;
+      border-radius: 18px 18px 18px 8px;
       background:
-        linear-gradient(180deg, color-mix(in srgb, var(--gold) 10%, transparent), transparent 48%),
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 14%, transparent), transparent 52%),
         color-mix(in srgb, var(--dock) 95%, transparent);
       color: var(--dock-ink);
       box-shadow:
-        0 12px 28px rgba(48, 36, 18, 0.14),
-        inset 0 0 0 1px color-mix(in srgb, var(--gold) 24%, transparent);
+        0 14px 30px rgba(48, 36, 18, 0.16),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 26%, transparent);
       backdrop-filter: blur(14px) saturate(1.15);
       -webkit-backdrop-filter: blur(14px) saturate(1.15);
-      font-size: 12.5px;
+      font-size: 13px;
       line-height: 1.55;
       letter-spacing: 0.03em;
       opacity: 0;
       transform: translateY(8px) scale(0.96);
       transition: opacity 0.24s ease, transform 0.24s ease;
       pointer-events: none;
-      margin-left: 52px;
+      margin-left: 8px;
     }
 
     .cat-bubble.is-on {
@@ -1207,75 +1526,76 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      padding: 10px 8px;
-      border-radius: 22px;
+      gap: 6px;
+      padding: 12px 10px 10px;
+      border-radius: 26px;
       background:
-        radial-gradient(circle at 30% 0%, color-mix(in srgb, var(--gold) 22%, transparent), transparent 46%),
+        radial-gradient(circle at 28% 0%, color-mix(in srgb, var(--gold) 28%, transparent), transparent 48%),
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 42%),
         color-mix(in srgb, var(--dock) 93%, transparent);
       box-shadow:
-        0 14px 30px rgba(40, 30, 16, 0.16),
-        inset 0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent),
-        inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
-      backdrop-filter: blur(16px) saturate(1.2);
-      -webkit-backdrop-filter: blur(16px) saturate(1.2);
+        0 16px 34px rgba(40, 30, 16, 0.18),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 26%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 38%, transparent);
+      backdrop-filter: blur(18px) saturate(1.22);
+      -webkit-backdrop-filter: blur(18px) saturate(1.22);
       pointer-events: auto;
     }
 
     .cat-bar::before {
       content: "";
       position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 8px;
+      left: 12px;
+      right: 12px;
+      top: 9px;
       height: 1px;
-      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--gold) 55%, transparent), transparent);
-      opacity: 0.7;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--gold) 62%, transparent), transparent);
+      opacity: 0.8;
       pointer-events: none;
     }
 
     .cat-bar button {
       position: relative;
-      width: 36px;
-      height: 36px;
+      width: 42px;
+      height: 42px;
       display: grid;
       place-items: center;
       border: 0;
-      border-radius: 12px;
-      background: color-mix(in srgb, var(--dock-ink) 4%, transparent);
+      border-radius: 15px;
+      background: color-mix(in srgb, var(--dock-ink) 5%, transparent);
       color: color-mix(in srgb, var(--gold) 42%, var(--dock-ink));
       cursor: pointer;
       transition:
         background 0.18s ease,
-        color 0.18s ease,
         transform 0.18s ease,
         box-shadow 0.18s ease;
     }
 
-    .cat-bar button svg {
-      width: 17px;
-      height: 17px;
+    .cat-bar button img {
+      width: 24px;
+      height: 24px;
       display: block;
+      object-fit: contain;
+      pointer-events: none;
+      transition: transform 0.32s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     .cat-bar button:hover,
     .cat-bar button:focus-visible {
-      background: color-mix(in srgb, var(--gold) 22%, transparent);
-      color: var(--gold);
-      transform: translateY(-1px) scale(1.04);
-      box-shadow: 0 6px 14px color-mix(in srgb, var(--gold) 22%, transparent);
+      background: color-mix(in srgb, var(--gold) 24%, transparent);
+      transform: translateY(-3px) scale(1.08);
+      box-shadow: 0 10px 18px color-mix(in srgb, var(--gold) 26%, transparent);
       outline: none;
+    }
+
+    .cat-bar button:hover img,
+    .cat-bar button:focus-visible img {
+      transform: rotate(-10deg) scale(1.12);
     }
 
     .cat-bar button:active {
       transform: translateY(0) scale(0.96);
     }
-
-    .cat-bar button[data-cat="music"] { color: #c0893a; }
-    .cat-bar button[data-cat="quote"] { color: #8a6a3a; }
-    .cat-bar button[data-cat="skin"] { color: #b8894a; }
-    .cat-bar button[data-cat="shot"] { color: #9a7340; }
-    .cat-bar button[data-cat="hide"] { color: #8b7350; }
 
     .cat-bar button::after {
       content: attr(title);
@@ -1305,45 +1625,47 @@
 
     #live2d-widget,
     #live2dcanvas {
+      width: 200px !important;
+      height: 350px !important;
       transition: filter 0.35s ease;
     }
 
     .cat-restore {
       position: fixed;
-      left: 14px;
-      bottom: 164px;
+      left: 16px;
+      bottom: 188px;
       z-index: 38;
-      width: 46px;
-      height: 46px;
+      width: 52px;
+      height: 52px;
       display: grid;
       place-items: center;
       border: 0;
-      border-radius: 16px;
+      border-radius: 18px;
       background:
-        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--gold) 28%, transparent), transparent 55%),
+        radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 55%),
         color-mix(in srgb, var(--dock) 94%, transparent);
-      color: color-mix(in srgb, var(--gold) 72%, var(--dock-ink));
       box-shadow:
         0 12px 26px rgba(40, 30, 16, 0.16),
         inset 0 0 0 1px color-mix(in srgb, var(--gold) 24%, transparent);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       cursor: pointer;
-      transition: transform 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
     .cat-restore[hidden] {
       display: none !important;
     }
 
-    .cat-restore svg {
-      width: 20px;
-      height: 20px;
+    .cat-restore img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      pointer-events: none;
     }
 
     .cat-restore:hover {
-      color: var(--gold);
-      transform: translateY(-2px) scale(1.04);
+      transform: translateY(-2px) scale(1.05);
       box-shadow:
         0 14px 28px rgba(40, 30, 16, 0.18),
         0 0 0 1px color-mix(in srgb, var(--gold) 28%, transparent);
@@ -1352,13 +1674,13 @@
     @media (max-width: 720px) {
       .cat-ui {
         left: 6px;
-        bottom: 148px;
-        transform: scale(0.9);
+        bottom: 150px;
+        transform: scale(0.86);
         transform-origin: left bottom;
       }
       .cat-restore {
-        left: 10px;
-        bottom: 148px;
+        left: 8px;
+        bottom: 150px;
       }
       .cat-bar button::after { display: none; }
     }
@@ -1375,9 +1697,9 @@
 
     .article-page {
       display: none;
-      width: min(760px, 100%);
+      width: min(780px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .article-page.is-open {
@@ -1385,7 +1707,8 @@
     }
 
     .article-page-shell {
-      padding: 26px 32px 36px;
+      position: relative;
+      padding: 30px 40px 44px;
       border-radius: 28px;
       background: color-mix(in srgb, var(--dock) 96%, transparent);
       color: var(--dock-ink);
@@ -1393,11 +1716,52 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid color-mix(in srgb, var(--gold) 18%, transparent);
+      transform-style: preserve-3d;
+    }
+
+    .article-page-shell::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 0;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), var(--gold), transparent);
+      opacity: 0.7;
+      pointer-events: none;
     }
 
     @keyframes article-in {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: none; }
+    }
+
+    @keyframes page-rise {
+      from { opacity: 0; transform: translateY(22px) scale(0.985); filter: blur(2px); }
+      to { opacity: 1; transform: none; filter: none; }
+    }
+
+    @keyframes reveal-up {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .is-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.45s ease, transform 0.55s cubic-bezier(0.22, 0.8, 0.28, 1);
+    }
+
+    .is-reveal.is-in {
+      opacity: 1;
+      transform: none;
+    }
+
+    .tilt-card {
+      transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--tilt-lift, 0px));
+      transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease;
+      will-change: transform;
     }
 
     .article-reader-nav {
@@ -1468,11 +1832,33 @@
 
     .article-reader-body {
       margin: 0;
-      font-size: 15px;
-      line-height: 1.95;
-      letter-spacing: 0.04em;
+      max-width: 42rem;
+      margin-inline: auto;
+      font-size: 16px;
+      line-height: 2;
+      letter-spacing: 0.045em;
       word-break: break-word;
-      opacity: 0.92;
+      opacity: 0.94;
+      text-wrap: pretty;
+    }
+
+    body.article-open .weather,
+    body.article-open .ios-dock,
+    body.article-open .player-fab,
+    body.article-open .cat-ui,
+    body.article-open .cat-restore {
+      opacity: 0.22;
+      filter: saturate(0.7);
+      transition: opacity 0.4s ease, filter 0.4s ease;
+    }
+
+    body.article-open .weather:hover,
+    body.article-open .ios-dock:hover,
+    body.article-open .player-fab:hover,
+    body.article-open .cat-ui:hover,
+    body.article-open .cat-restore:hover {
+      opacity: 1;
+      filter: none;
     }
 
     .article-reader-body > * + * {
@@ -1625,15 +2011,24 @@
       }
 
       .topbar {
-        width: calc(100% - 16px);
-        min-height: 46px;
-        padding: 6px 8px;
-        border-radius: 14px;
+        width: 100%;
+        min-height: 54px;
+        padding: 6px 10px;
+        border-radius: 0;
         justify-content: flex-start;
       }
 
+      .topbar-brand {
+        display: none;
+      }
+
+      .topbar-nav {
+        margin: 0;
+        max-width: 100%;
+      }
+
       .topbar-link {
-        padding: 6px 8px;
+        padding: 5px 10px 5px 6px;
         font-size: 12px;
       }
 
@@ -1651,7 +2046,7 @@
       --wx-muted: rgba(247, 250, 252, 0.64);
       --wx-panel: #4f6574;
       position: fixed;
-      top: 70px;
+      top: 72px;
       left: 22px;
       z-index: 40;
       width: 158px;
@@ -1724,23 +2119,27 @@
     .verse {
       position: relative;
       z-index: 2;
-      width: min(100%, 520px);
+      width: min(100%, 560px);
       margin: 0 auto;
-      padding: 16px 22px 18px;
-      border-radius: 22px;
+      padding: 18px 24px 20px;
+      border-radius: 24px;
       background:
+        radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--gold) 18%, transparent), transparent 52%),
         linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 42%),
         color-mix(in srgb, var(--dock) 92%, transparent);
       color: var(--dock-ink);
-      box-shadow: var(--dock-shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      box-shadow:
+        var(--dock-shadow),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 24%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 36%, transparent);
+      backdrop-filter: blur(16px) saturate(1.16);
+      -webkit-backdrop-filter: blur(16px) saturate(1.16);
       font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", "STSong", serif;
       text-align: center;
-      border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
+      border: 0;
       cursor: pointer;
       overflow: hidden;
-      transition: transform 0.28s ease, box-shadow 0.28s ease, opacity 0.35s ease, border-color 0.28s ease;
+      transition: transform 0.28s cubic-bezier(0.22, 1.2, 0.32, 1), box-shadow 0.28s ease, opacity 0.35s ease;
     }
 
     .verse::before {
@@ -1768,9 +2167,10 @@
     }
 
     .verse:hover {
-      transform: translateY(-2px);
-      border-color: color-mix(in srgb, var(--gold) 42%, transparent);
-      box-shadow: 0 14px 28px rgba(42, 54, 74, 0.18), 0 0 0 1px color-mix(in srgb, var(--gold) 12%, transparent);
+      transform: translateY(-4px) scale(1.01);
+      box-shadow:
+        0 18px 32px color-mix(in srgb, var(--gold) 18%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 36%, transparent);
     }
 
     .verse-mark {
@@ -2062,7 +2462,7 @@
       display: none;
       width: min(420px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .about-page.is-open {
@@ -2177,9 +2577,11 @@
       gap: 10px;
       width: 100%;
       min-height: 44px;
-      padding: 0 10px;
+      padding: 0 12px;
       border: 0;
-      border-bottom: 1px solid color-mix(in srgb, var(--dock-ink) 8%, transparent);
+      border-bottom: 0;
+      border-radius: 12px;
+      margin: 2px 0;
       background: transparent;
       color: color-mix(in srgb, var(--gold) 55%, #6b4b16);
       font: inherit;
@@ -2188,7 +2590,7 @@
       text-align: left;
       text-decoration: none;
       cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.22s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     [data-theme="dark"] .about-menu a,
@@ -2203,9 +2605,9 @@
 
     .about-menu a:hover,
     .about-menu button:hover {
-      background: color-mix(in srgb, var(--gold) 10%, transparent);
+      background: color-mix(in srgb, var(--gold) 12%, transparent);
       color: var(--gold);
-      padding-left: 14px;
+      transform: translateX(4px);
     }
 
     .about-menu svg {
@@ -2236,12 +2638,14 @@
     }
 
     .about-btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.03);
+      transform: translateY(-3px) scale(1.03);
+      filter: brightness(1.05);
+      box-shadow: 0 12px 22px color-mix(in srgb, var(--gold) 28%, transparent);
     }
 
     .about-btn:active {
-      transform: translateY(0);
+      transform: translateY(0) scale(0.96);
+      transition-duration: 0.08s;
     }
 
     .about-btn.is-primary {
@@ -2268,7 +2672,7 @@
       display: none;
       width: min(720px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .posts-page.is-open {
@@ -2360,15 +2764,32 @@
     }
 
     .posts-item-btn {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --tilt-lift: 0px;
       display: block;
       width: 100%;
       border: 0;
-      padding: 0;
-      background: transparent;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 7%, transparent), transparent 70%),
+        color-mix(in srgb, var(--dock-ink) 3%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 12%, transparent);
       color: inherit;
       font: inherit;
       text-align: left;
       cursor: pointer;
+      transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift));
+      transition: transform 0.18s ease, box-shadow 0.22s ease, background 0.22s ease;
+    }
+
+    .posts-item-btn:hover {
+      --tilt-lift: -4px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 14%, transparent), transparent 70%),
+        color-mix(in srgb, var(--gold) 8%, transparent);
+      box-shadow: 0 12px 22px color-mix(in srgb, var(--gold) 14%, transparent);
     }
 
     .posts-item-title {
@@ -2411,7 +2832,7 @@
       display: none;
       width: min(720px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .tags-page.is-open {
@@ -2466,7 +2887,7 @@
       color: color-mix(in srgb, var(--gold) 55%, #6b4b16);
       font: inherit;
       cursor: pointer;
-      transition: color 0.16s ease;
+      transition: color 0.16s ease, transform 0.18s cubic-bezier(0.22, 1.4, 0.32, 1);
     }
 
     [data-theme="dark"] .tags-sort button {
@@ -2476,6 +2897,7 @@
     .tags-sort button:hover,
     .tags-sort button.is-active {
       color: var(--gold);
+      transform: translateY(-1px);
     }
 
     .tags-sort button.is-active {
@@ -2503,15 +2925,24 @@
     .tags-cloud-btn {
       display: inline-flex;
       align-items: baseline;
-      gap: 4px;
+      gap: 6px;
       max-width: 100%;
       border: 0;
-      padding: 2px 0;
-      background: transparent;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--gold) 8%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
       color: inherit;
       font: inherit;
       text-align: left;
       cursor: pointer;
+      transition: transform 0.22s cubic-bezier(0.22, 1.4, 0.32, 1), background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .tags-cloud-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      background: color-mix(in srgb, var(--gold) 16%, transparent);
+      box-shadow: 0 8px 16px color-mix(in srgb, var(--gold) 16%, transparent);
     }
 
     .tags-cloud-name {
@@ -2554,7 +2985,7 @@
       display: none;
       width: min(720px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .links-page.is-open {
@@ -2597,7 +3028,7 @@
     .links-table th,
     .links-table td {
       padding: 12px 14px;
-      border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
+      border: 1px solid color-mix(in srgb, var(--gold) 22%, transparent);
       text-align: left;
       vertical-align: middle;
     }
@@ -2606,7 +3037,7 @@
       width: 28%;
       color: color-mix(in srgb, var(--gold) 55%, #6b4b16);
       font-weight: 700;
-      background: color-mix(in srgb, var(--gold) 8%, transparent);
+      background: color-mix(in srgb, var(--gold) 12%, transparent);
       white-space: nowrap;
     }
 
@@ -2737,22 +3168,34 @@
     }
 
     .friend-link-card {
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --tilt-lift: 0px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      padding: 14px 10px;
-      border-radius: 16px;
+      padding: 16px 12px 14px;
+      border-radius: 18px;
       text-decoration: none;
       color: inherit;
-      background: color-mix(in srgb, var(--gold) 7%, transparent);
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 14%, transparent);
-      transition: transform 0.2s ease, background 0.2s ease;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 12%, transparent), transparent 62%),
+        color-mix(in srgb, var(--gold) 6%, transparent);
+      box-shadow:
+        0 8px 16px color-mix(in srgb, var(--gold) 10%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 18%, transparent);
+      transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift)) scale(1);
+      transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.22s ease;
     }
 
     .friend-link-card:hover {
-      transform: translateY(-2px);
-      background: color-mix(in srgb, var(--gold) 14%, transparent);
+      --tilt-lift: -6px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 20%, transparent), transparent 62%),
+        color-mix(in srgb, var(--gold) 12%, transparent);
+      box-shadow: 0 16px 26px color-mix(in srgb, var(--gold) 22%, transparent);
+      transform: perspective(900px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--tilt-lift)) scale(1.03);
     }
 
     .friend-link-card img {
@@ -2785,11 +3228,76 @@
       opacity: 0.45;
     }
 
+    .links-guestbook {
+      margin: 28px 0 0;
+      padding: 22px 18px 8px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 55%),
+        color-mix(in srgb, var(--dock-ink) 3%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
+      scroll-margin-top: 88px;
+    }
+
+    .links-guestbook-title {
+      margin: 0 0 8px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 750;
+      letter-spacing: 0.12em;
+      color: color-mix(in srgb, var(--gold) 48%, #7a5318);
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
+    }
+
+    [data-theme="dark"] .links-guestbook-title {
+      color: color-mix(in srgb, var(--gold) 82%, #f6e7bf);
+    }
+
+    .article-comments {
+      margin: 36px 0 0;
+      padding: 22px 4px 0;
+      border-top: 1px dashed color-mix(in srgb, var(--gold) 28%, transparent);
+      animation: page-rise 0.5s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+      animation-delay: 0.08s;
+    }
+
+    .article-comments-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 750;
+      letter-spacing: 0.1em;
+      color: color-mix(in srgb, var(--gold) 48%, #7a5318);
+      font-family: "Iowan Old Style", "Palatino Linotype", "Songti SC", serif;
+    }
+
+    [data-theme="dark"] .article-comments-title {
+      color: color-mix(in srgb, var(--gold) 82%, #f6e7bf);
+    }
+
+    .article-comments-count {
+      min-width: 22px;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #1c1914;
+      background: var(--gold);
+      box-shadow: 0 4px 10px color-mix(in srgb, var(--gold) 28%, transparent);
+    }
+
     .admin-page {
       display: none;
       width: min(820px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .admin-page.is-open {
@@ -2926,6 +3434,17 @@
       font-weight: 650;
       letter-spacing: 0.08em;
       cursor: pointer;
+      transform: translateY(0) scale(1);
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.28s cubic-bezier(0.22, 1.4, 0.32, 1),
+        box-shadow 0.2s ease;
+    }
+
+    .admin-tab:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 14px color-mix(in srgb, var(--gold) 16%, transparent);
     }
 
     .admin-tab.is-active {
@@ -3116,7 +3635,7 @@
       display: none;
       width: min(720px, 100%);
       margin: 0 auto;
-      animation: article-in 0.28s ease;
+      animation: page-rise 0.55s cubic-bezier(0.22, 0.8, 0.28, 1) both;
     }
 
     .guestbook-page.is-open {
@@ -3209,8 +3728,18 @@
     .guestbook-item {
       padding: 14px 16px;
       border-radius: 18px;
-      background: color-mix(in srgb, var(--dock-ink) 4%, transparent);
-      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 14%, transparent);
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
+        color-mix(in srgb, var(--dock-ink) 4%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 16%, transparent);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .guestbook-item:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 10px 18px color-mix(in srgb, var(--gold) 12%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 26%, transparent);
     }
 
     .guestbook-item.is-host {
@@ -3454,6 +3983,7 @@
 
     .ios-dock-app[data-icon-fit="contain"] .ios-dock-icon img,
     .ios-dock-app[data-icon-host="im.qq.com"] .ios-dock-icon img,
+    .side-link[data-icon-fit="contain"] img,
     .side-link[data-icon-host="im.qq.com"] img {
       object-fit: contain;
       padding: 6px;
@@ -3828,6 +4358,7 @@
     .player-controls button:hover {
       opacity: 1;
       background: rgba(184, 137, 58, 0.12);
+      transform: scale(1.08);
     }
 
     .player-controls .is-play {
@@ -4001,10 +4532,26 @@
       pointer-events: none;
       opacity: 0;
       transform: translate3d(var(--x), var(--y), 0);
-      transition: opacity 0.14s ease;
+      transition: opacity 0.1s linear;
+      will-change: transform;
+      contain: layout style;
     }
 
     .cursor.is-on { opacity: 1; }
+
+    .cursor::after {
+      content: "";
+      position: absolute;
+      left: -10px;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle, color-mix(in srgb, var(--cursor-gold) 35%, transparent), transparent 70%);
+      opacity: 0.55;
+      pointer-events: none;
+      filter: blur(1px);
+    }
 
     .glyph {
       position: absolute;
@@ -4019,53 +4566,59 @@
     .cursor[data-mode="text"] .glyph-text { opacity: 1; }
 
     .glyph-arrow {
-      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 1px 1.5px rgba(20, 16, 12, 0.28));
+      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 2px 6px color-mix(in srgb, var(--cursor-gold) 45%, transparent));
       transform-origin: 2px 1px;
     }
 
     .cursor.is-down[data-mode="arrow"] .glyph-arrow {
-      transform: scale(0.86);
-      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 8px var(--cursor-gem));
+      transform: scale(0.86) rotate(-6deg);
+      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 12px var(--cursor-gem));
     }
 
     .glyph-arrow svg, .glyph-text svg { display: block; }
 
     .glyph-pointer {
-      width: 34px;
-      height: 34px;
-      margin: -17px 0 0 -17px;
-      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 8px color-mix(in srgb, var(--cursor-gold) 40%, transparent));
+      width: 38px;
+      height: 38px;
+      margin: -19px 0 0 -19px;
+      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 10px color-mix(in srgb, var(--cursor-gold) 50%, transparent));
+    }
+
+    .cursor[data-mode="pointer"] .glyph-pointer {
+      animation: pointer-breathe 1.8s ease-in-out infinite;
     }
 
     .cursor.is-down[data-mode="pointer"] .glyph-pointer {
-      transform: scale(0.74);
-      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 12px var(--cursor-gem));
+      transform: scale(0.72);
+      animation: none;
+      filter: drop-shadow(0 0 1px var(--cursor-edge)) drop-shadow(0 0 16px var(--cursor-gem));
     }
 
     .ring {
       display: block;
       width: 100%;
       height: 100%;
-      border: 1.25px solid var(--cursor-ink);
+      border: 1.4px solid var(--cursor-ink);
       border-radius: 50%;
-      background: radial-gradient(circle, transparent 52%, var(--cursor-gold) 56% 68%, transparent 72%);
+      background: radial-gradient(circle, transparent 48%, var(--cursor-gold) 54% 68%, transparent 74%);
       box-shadow:
         inset 0 0 0 1px var(--cursor-edge),
-        0 0 0 4px color-mix(in srgb, var(--cursor-gold) 12%, transparent);
+        0 0 0 5px color-mix(in srgb, var(--cursor-gold) 16%, transparent);
     }
 
     .gem {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 7px;
-      height: 7px;
-      margin: -3.5px 0 0 -3.5px;
+      width: 8px;
+      height: 8px;
+      margin: -4px 0 0 -4px;
       background: linear-gradient(135deg, var(--cursor-gem) 0%, var(--cursor-gold) 62%, #8d6424 100%);
       box-shadow:
         0 0 0 1px color-mix(in srgb, var(--cursor-ink) 35%, transparent),
-        0 0 10px color-mix(in srgb, var(--cursor-gold) 55%, transparent);
+        0 0 12px color-mix(in srgb, var(--cursor-gold) 65%, transparent);
       transform: rotate(45deg);
+      animation: gem-twinkle 1.4s ease-in-out infinite;
       transition: transform 0.14s ease, box-shadow 0.14s ease;
     }
 
@@ -4087,7 +4640,7 @@
     .halo {
       --x: -80px;
       --y: -80px;
-      --halo-size: 30px;
+      --halo-size: 28px;
       position: fixed;
       top: 0;
       left: 0;
@@ -4100,26 +4653,28 @@
       pointer-events: none;
       opacity: 0;
       transform: translate3d(var(--x), var(--y), 0) scale(1);
-      background: radial-gradient(circle, color-mix(in srgb, var(--cursor-gold) 12%, transparent) 0%, transparent 70%);
-      box-shadow: 0 0 12px color-mix(in srgb, var(--cursor-gold) 16%, transparent);
+      background: radial-gradient(circle, color-mix(in srgb, var(--cursor-gold) 14%, transparent) 0%, transparent 70%);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--cursor-gold) 20%, transparent);
       transition:
-        opacity 0.14s linear,
-        width 0.18s cubic-bezier(0.22, 0.8, 0.28, 1),
-        height 0.18s cubic-bezier(0.22, 0.8, 0.28, 1),
-        margin 0.18s cubic-bezier(0.22, 0.8, 0.28, 1);
+        opacity 0.1s linear,
+        width 0.16s cubic-bezier(0.22, 0.8, 0.28, 1),
+        height 0.16s cubic-bezier(0.22, 0.8, 0.28, 1),
+        margin 0.16s cubic-bezier(0.22, 0.8, 0.28, 1);
       will-change: transform;
+      contain: layout style;
     }
 
-    .halo.is-on { opacity: 0.55; }
-    .halo.is-on.is-arrow { opacity: 0.9; }
+    .halo.is-on { opacity: 0.62; }
+    .halo.is-on.is-arrow { opacity: 0.92; }
     .halo.is-pointer {
-      --halo-size: 44px;
-      opacity: 0.72;
-      border-color: color-mix(in srgb, var(--cursor-gem) 70%, transparent);
-      background: radial-gradient(circle, color-mix(in srgb, var(--cursor-gem) 22%, transparent) 0%, transparent 70%);
-      box-shadow: 0 0 24px color-mix(in srgb, var(--cursor-gold) 35%, transparent);
+      --halo-size: 52px;
+      opacity: 0.78;
+      border-color: color-mix(in srgb, var(--cursor-gem) 75%, transparent);
+      background: radial-gradient(circle, color-mix(in srgb, var(--cursor-gem) 26%, transparent) 0%, transparent 70%);
+      box-shadow: 0 0 28px color-mix(in srgb, var(--cursor-gold) 42%, transparent);
+      animation: halo-pulse 1.6s ease-in-out infinite;
     }
-    .halo.is-down { transform: translate3d(var(--x), var(--y), 0) scale(0.68); }
+    .halo.is-down { animation: none; }
 
     .click-burst {
       --x: 0px;
@@ -4208,45 +4763,92 @@
       100% { transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(0.2); opacity: 0; }
     }
 
+    @keyframes pointer-breathe {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    @keyframes gem-twinkle {
+      0%, 100% { filter: brightness(1); box-shadow: 0 0 10px color-mix(in srgb, var(--cursor-gold) 55%, transparent); }
+      50% { filter: brightness(1.25); box-shadow: 0 0 16px var(--cursor-gem); }
+    }
+
+    @keyframes halo-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 0.95; }
+    }
+
+    @keyframes btn-sheen {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+
+    .article-page-shell,
+    .posts-shell,
+    .tags-shell,
+    .links-shell,
+    .admin-shell,
+    .guestbook-shell,
+    .about-shell {
+      background:
+        radial-gradient(circle at 14% 0%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 46%),
+        linear-gradient(180deg, color-mix(in srgb, var(--gold) 6%, transparent), transparent 38%),
+        color-mix(in srgb, var(--dock) 93%, transparent) !important;
+      box-shadow:
+        var(--dock-shadow),
+        inset 0 0 0 1px color-mix(in srgb, var(--gold) 22%, transparent),
+        inset 0 1px 0 color-mix(in srgb, #fff 32%, transparent) !important;
+      backdrop-filter: blur(18px) saturate(1.16) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(1.16) !important;
+      border-color: transparent !important;
+    }
+
     @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
       .click-burst, .halo, .cursor-dust { display: none; }
-      .glyph-pointer { animation: none; }
-      .read-progress > span { transition: none; }
-      .dock-item, .dock-icon, .dock-panel, .note, html.theme-ready, .player, .player-deck, .player-fab, .tonearm, .weather, .weather-panel, .weather-chip, .verse, .back-top, .ios-dock-app, .topbar-link, .board-action, .side-link, .side-tag, .ctx-item { transition: none; }
-      .vinyl, .mini-disc .mini-vinyl, .weather-clouds, .weather-hero-icon, .weather-bokeh, .player-progress span, .egg-plane-trail { animation: none !important; }
+      .glyph-pointer, .gem, .halo.is-pointer { animation: none !important; }
+      .read-progress > span { transition: none; animation: none !important; }
+      body::before, body::after { transform: none !important; opacity: 0.2; }
+      .is-reveal { opacity: 1; transform: none; transition: none; }
+      .dock-item, .dock-icon, .dock-panel, .note, html.theme-ready, .player, .player-deck, .player-fab, .tonearm, .weather, .weather-panel, .weather-chip, .verse, .back-top, .ios-dock-app, .topbar-link, .board-action, .side-link, .side-tag, .side-block, .side-search button, .ctx-item, .article-item-card, .posts-item-btn, .friend-link-card, .tags-cloud-btn, .guestbook-item, .topbar, .stage { transition: none; }
+      .vinyl, .mini-disc .mini-vinyl, .weather-clouds, .weather-hero-icon, .weather-bokeh, .player-progress span, .egg-plane-trail, .board, .article-page, .about-page, .posts-page, .tags-page, .links-page, .admin-page, .guestbook-page { animation: none !important; }
     }
   </style>
 </head>
 <body>
   <div class="read-progress" id="read-progress" aria-hidden="true"><span></span></div>
   <header class="topbar" aria-label="顶栏" data-label-hans="顶栏" data-label-hant="頂欄">
+    <span class="topbar-brand">
+      <img src="assets/polandball.png" alt="" width="28" height="28" decoding="async" />
+      wangyutang
+    </span>
     <nav class="topbar-nav" aria-label="站点导航">
-      <button class="topbar-link" type="button" data-nav="home">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 8.2 9 3l6 5.2V15a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8.2Z" fill="#e8c78a"/><path d="M3.2 8.4 9 3.2l5.8 5.2" fill="none" stroke="#ef4444" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.4 16v-4.2h3.2V16" fill="#c4a46a"/></svg>
+      <button class="topbar-link" type="button" data-nav="home" data-top-icon="home">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="首页" data-hant="首頁">首页</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="about">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6.2" r="3" fill="#14b8a6"/><path d="M3.5 15.2c.7-3 2.6-4.5 5.5-4.5s4.8 1.5 5.5 4.5" fill="#14b8a6"/></svg>
+      <button class="topbar-link" type="button" data-nav="about" data-top-icon="about">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="关于" data-hant="關於">关于</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="articles">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="4" width="12" height="3" rx="1" fill="#34d399"/><rect x="4" y="7.5" width="10" height="3" rx="1" fill="#6ee7b7"/><rect x="5" y="11" width="8" height="3" rx="1" fill="#a7f3d0"/></svg>
+      <button class="topbar-link" type="button" data-nav="articles" data-top-icon="articles">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="文章" data-hant="文章">文章</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="tags">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M8.2 3.2h5.6v5.6L8.4 14.2 3.8 9.6 8.2 3.2Z" fill="#fbbf24"/><circle cx="11.4" cy="6.4" r="1.1" fill="#1d4ed8"/></svg>
+      <button class="topbar-link" type="button" data-nav="tags" data-top-icon="tags">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="标签" data-hant="標籤">标签</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="links">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7.2 10.8a3.2 3.2 0 0 1 0-4.5l1.8-1.8a3.2 3.2 0 0 1 4.5 4.5l-.9.9" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/><path d="M10.8 7.2a3.2 3.2 0 0 1 0 4.5l-1.8 1.8a3.2 3.2 0 1 1-4.5-4.5l.9-.9" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <button class="topbar-link" type="button" data-nav="links" data-top-icon="links">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="友链" data-hant="友鏈">友链</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="guestbook">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="3.5" width="12" height="9.5" rx="2" fill="#60a5fd"/><path d="M6 15h6" stroke="#2563eb" stroke-width="1.6" stroke-linecap="round"/><circle cx="7" cy="8" r="1" fill="#fff"/><circle cx="11" cy="8" r="1" fill="#fff"/><path d="M7.2 10.4c.7.7 2.9.7 3.6 0" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <button class="topbar-link" type="button" data-nav="guestbook" data-top-icon="guestbook">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="留言板" data-hant="留言板">留言板</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="admin">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="3" width="13" height="9.5" rx="1.4" fill="#94a3b8"/><rect x="4" y="4.5" width="10" height="6.5" rx="0.8" fill="#e2e8f0"/><path d="M7 7.2 5.6 8.6 7 10M11 7.2l1.4 1.4L11 10" fill="none" stroke="#475569" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15h8" stroke="#64748b" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <button class="topbar-link" type="button" data-nav="admin" data-top-icon="admin">
+        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="后台管理" data-hant="後台管理">后台管理</span>
       </button>
     </nav>
@@ -4269,38 +4871,48 @@
       </section>
       <aside class="board-side" aria-label="侧边栏" data-label-hans="侧边栏" data-label-hant="側邊欄">
         <div class="side-block">
-          <p class="side-label" data-hans="常用链接" data-hant="常用連結">常用链接</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="links" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="常用链接" data-hant="常用連結">常用链接</span>
+          </p>
           <div class="side-links">
-            <a class="side-link" href="https://www.bilibili.com" target="_blank" rel="noopener noreferrer" data-icon-host="www.bilibili.com">
-              <img alt="" width="22" height="22" decoding="async" />
+            <a class="side-link" href="https://www.bilibili.com" target="_blank" rel="noopener noreferrer" data-icon-host="www.bilibili.com" data-icon-fit="contain">
+              <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
               <span>B站</span>
             </a>
-            <a class="side-link" href="https://www.baidu.com" target="_blank" rel="noopener noreferrer" data-icon-host="www.baidu.com">
-              <img alt="" width="22" height="22" decoding="async" />
+            <a class="side-link" href="https://www.baidu.com" target="_blank" rel="noopener noreferrer" data-icon-host="www.baidu.com" data-icon-fit="contain">
+              <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
               <span data-hans="百度" data-hant="百度">百度</span>
             </a>
-            <a class="side-link" href="https://github.com/catcoder-0" target="_blank" rel="noopener noreferrer" data-icon-host="github.com">
-              <img alt="" width="22" height="22" decoding="async" />
+            <a class="side-link" href="https://github.com/catcoder-0" target="_blank" rel="noopener noreferrer" data-icon-host="github.com" data-icon-fit="contain">
+              <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
               <span>GitHub</span>
             </a>
-            <a class="side-link" href="https://weixin.qq.com" target="_blank" rel="noopener noreferrer" data-icon-host="weixin.qq.com">
-              <img alt="" width="22" height="22" decoding="async" />
+            <a class="side-link" href="https://weixin.qq.com" target="_blank" rel="noopener noreferrer" data-icon-host="weixin.qq.com" data-icon-fit="contain">
+              <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
               <span data-hans="微信" data-hant="微信">微信</span>
             </a>
             <a class="side-link" href="https://im.qq.com" target="_blank" rel="noopener noreferrer" data-icon-host="im.qq.com" data-icon-fit="contain">
-              <img alt="" width="22" height="22" decoding="async" />
+              <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
               <span>QQ</span>
             </a>
           </div>
         </div>
 
         <div class="side-block">
-          <p class="side-label" data-hans="日历" data-hant="日曆">日历</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="calendar" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="日历" data-hant="日曆">日历</span>
+          </p>
           <div class="calendar" id="side-calendar">
             <div class="calendar-head">
-              <button type="button" id="cal-prev" aria-label="上一月">‹</button>
+              <button type="button" id="cal-prev" aria-label="上一月">
+                <img alt="" width="14" height="14" data-side-icon="cal-prev" decoding="async" referrerpolicy="no-referrer" />
+              </button>
               <strong id="cal-title">2026年3月</strong>
-              <button type="button" id="cal-next" aria-label="下一月">›</button>
+              <button type="button" id="cal-next" aria-label="下一月">
+                <img alt="" width="14" height="14" data-side-icon="cal-next" decoding="async" referrerpolicy="no-referrer" />
+              </button>
             </div>
             <div class="calendar-week" aria-hidden="true">
               <span data-hans="日" data-hant="日">日</span>
@@ -4316,28 +4928,52 @@
         </div>
 
         <div class="side-block">
-          <p class="side-label" data-hans="搜文章" data-hant="搜文章">搜文章</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="search" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="搜文章" data-hant="搜文章">搜文章</span>
+          </p>
           <form class="side-search" id="search-article" action="#">
-            <input id="article-query" type="search" name="q" autocomplete="off" data-ph-hans="文章关键词" data-ph-hant="文章關鍵詞" placeholder="文章关键词" />
-            <button type="submit" data-hans="搜索" data-hant="搜索">搜索</button>
+            <div class="side-search-field">
+              <img alt="" width="16" height="16" data-side-icon="search" decoding="async" referrerpolicy="no-referrer" />
+              <input id="article-query" type="search" name="q" autocomplete="off" data-ph-hans="文章关键词" data-ph-hant="文章關鍵詞" placeholder="文章关键词" />
+            </div>
+            <button type="submit">
+              <img alt="" width="14" height="14" data-side-icon="go" decoding="async" referrerpolicy="no-referrer" />
+              <span data-hans="搜索" data-hant="搜索">搜索</span>
+            </button>
           </form>
         </div>
 
         <div class="side-block">
-          <p class="side-label" data-hans="搜百度" data-hant="搜百度">搜百度</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="baidu" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="搜百度" data-hant="搜百度">搜百度</span>
+          </p>
           <form class="side-search" id="search-baidu" action="#">
-            <input id="baidu-query" type="search" name="wd" autocomplete="off" data-ph-hans="百度关键词" data-ph-hant="百度關鍵詞" placeholder="百度关键词" />
-            <button class="is-primary" type="submit" data-hans="搜索" data-hant="搜索">搜索</button>
+            <div class="side-search-field">
+              <img alt="" width="16" height="16" data-side-icon="search" decoding="async" referrerpolicy="no-referrer" />
+              <input id="baidu-query" type="search" name="wd" autocomplete="off" data-ph-hans="百度关键词" data-ph-hant="百度關鍵詞" placeholder="百度关键词" />
+            </div>
+            <button class="is-primary" type="submit">
+              <img alt="" width="14" height="14" data-side-icon="go" decoding="async" referrerpolicy="no-referrer" />
+              <span data-hans="搜索" data-hant="搜索">搜索</span>
+            </button>
           </form>
         </div>
 
         <div class="side-block">
-          <p class="side-label" data-hans="最新文章" data-hant="最新文章">最新文章</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="latest" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="最新文章" data-hant="最新文章">最新文章</span>
+          </p>
           <ul class="side-latest" id="side-latest"></ul>
         </div>
 
         <div class="side-block">
-          <p class="side-label" data-hans="文章标签" data-hant="文章標籤">文章标签</p>
+          <p class="side-label">
+            <img alt="" width="18" height="18" data-side-icon="tags" decoding="async" referrerpolicy="no-referrer" />
+            <span data-hans="文章标签" data-hant="文章標籤">文章标签</span>
+          </p>
           <div class="side-tags" id="side-tags"></div>
         </div>
       </aside>
@@ -4430,7 +5066,7 @@
         </p>
         <p class="links-guide">
           <span data-hans="然后在" data-hant="然後在">然后在</span>
-          <button class="is-soft" type="button" data-nav="guestbook" data-hans="下方留言板" data-hant="下方留言板">下方留言板</button>
+          <button class="is-soft" type="button" data-scroll-to="links-guestbook" data-hans="下方留言板" data-hant="下方留言板">下方留言板</button>
           <span data-hans="留言，或" data-hant="留言，或">留言，或</span>
           <button class="is-soft" type="button" data-nav="message" data-hans="私信我" data-hant="私信我">私信我</button>
           <span data-hans="您的博客信息，格式如下：" data-hant="您的博客資訊，格式如下：">您的博客信息，格式如下：</span>
@@ -4459,6 +5095,24 @@
           <h2 class="friend-links-title" data-hans="邻居们" data-hant="鄰居們">邻居们</h2>
           <ul class="friend-links-grid" id="friend-links-grid"></ul>
           <p class="friend-links-empty" id="friend-links-empty" hidden data-hans="还没有友链，去后台添加吧" data-hant="還沒有友鏈，去後台添加吧">还没有友链，去后台添加吧</p>
+        </div>
+        <div class="links-guestbook" id="links-guestbook">
+          <h2 class="links-guestbook-title" data-hans="友链留言板" data-hant="友鏈留言板">友链留言板</h2>
+          <p class="guestbook-hint" data-hans="互换友链可在此留言博客信息；内容保存在本机。「wangyutang」需后台登录后才能使用。" data-hant="互換友鏈可在此留言博客資訊；內容保存在本機。「wangyutang」需後台登錄後才能使用。">互换友链可在此留言博客信息；内容保存在本机。「wangyutang」需后台登录后才能使用。</p>
+          <form class="guestbook-form" id="links-guestbook-form" data-guestbook-form>
+            <label>
+              <span data-hans="昵称" data-hant="暱稱">昵称</span>
+              <input name="name" maxlength="24" autocomplete="nickname" data-ph-hans="怎么称呼你" data-ph-hant="怎麼稱呼你" placeholder="怎么称呼你" required />
+            </label>
+            <label>
+              <span data-hans="留言" data-hant="留言">留言</span>
+              <textarea name="body" maxlength="500" data-ph-hans="博客名称 / 地址 / 头像 / 介绍…" data-ph-hant="博客名稱 / 地址 / 頭像 / 介紹…" placeholder="博客名称 / 地址 / 头像 / 介绍…" required></textarea>
+            </label>
+            <div class="guestbook-form-actions">
+              <button class="board-action" type="submit" data-hans="发送留言" data-hant="發送留言">发送留言</button>
+            </div>
+          </form>
+          <ul class="guestbook-list" id="links-guestbook-list" data-guestbook-list></ul>
         </div>
       </div>
     </section>
@@ -4558,7 +5212,7 @@
       <div class="guestbook-shell">
         <h1 class="guestbook-title" data-hans="留言板" data-hant="留言板">留言板</h1>
         <p class="guestbook-hint" data-hans="留下一句想说的话，内容保存在本机浏览器里。「wangyutang」需后台登录后才能使用。" data-hant="留下一句想說的話，內容保存在本機瀏覽器裡。「wangyutang」需後台登錄後才能使用。">留下一句想说的话，内容保存在本机浏览器里。「wangyutang」需后台登录后才能使用。</p>
-        <form class="guestbook-form" id="guestbook-form">
+        <form class="guestbook-form" id="guestbook-form" data-guestbook-form>
           <label>
             <span data-hans="昵称" data-hant="暱稱">昵称</span>
             <input id="guestbook-name" name="name" maxlength="24" autocomplete="nickname" data-ph-hans="怎么称呼你" data-ph-hant="怎麼稱呼你" placeholder="怎么称呼你" required />
@@ -4571,7 +5225,7 @@
             <button class="board-action" type="submit" data-hans="发送留言" data-hant="發送留言">发送留言</button>
           </div>
         </form>
-        <ul class="guestbook-list" id="guestbook-list"></ul>
+        <ul class="guestbook-list" id="guestbook-list" data-guestbook-list></ul>
       </div>
     </section>
 
@@ -4617,6 +5271,27 @@
         </div>
         <hr class="article-reader-rule" />
         <div class="article-reader-body" id="reader-body"></div>
+        <section class="article-comments" id="article-comments" aria-label="文章留言">
+          <h2 class="article-comments-title">
+            <span data-hans="文章留言" data-hant="文章留言">文章留言</span>
+            <span class="article-comments-count" id="article-comments-count">0</span>
+          </h2>
+          <p class="guestbook-hint" data-hans="写下读后感吧，内容保存在本机。「wangyutang」需后台登录后才能使用。" data-hant="寫下讀後感吧，內容保存在本機。「wangyutang」需後台登錄後才能使用。">写下读后感吧，内容保存在本机。「wangyutang」需后台登录后才能使用。</p>
+          <form class="guestbook-form" id="article-comment-form">
+            <label>
+              <span data-hans="昵称" data-hant="暱稱">昵称</span>
+              <input id="article-comment-name" name="name" maxlength="24" autocomplete="nickname" data-ph-hans="怎么称呼你" data-ph-hant="怎麼稱呼你" placeholder="怎么称呼你" required />
+            </label>
+            <label>
+              <span data-hans="留言" data-hant="留言">留言</span>
+              <textarea id="article-comment-body" name="body" maxlength="500" data-ph-hans="写点想说的…" data-ph-hant="寫點想說的…" placeholder="写点想说的…" required></textarea>
+            </label>
+            <div class="guestbook-form-actions">
+              <button class="board-action" type="submit" data-hans="发表留言" data-hant="發表留言">发表留言</button>
+            </div>
+          </form>
+          <ul class="guestbook-list" id="article-comment-list"></ul>
+        </section>
       </div>
     </section>
   </main>
@@ -5654,6 +6329,8 @@
         sideTags.innerHTML = html;
       }
 
+      var paintSideIcons = function () {};
+
       function renderLatest() {
         if (!sideLatest) return;
         if (!articles.length) {
@@ -5661,8 +6338,11 @@
           return;
         }
         sideLatest.innerHTML = articles.slice(0, 4).map(function (item) {
-          return '<li><a href="#' + encodeURIComponent(item.id) + '" data-open-article="' + escapeHtml(item.id) + '">' + escapeHtml(item.title) + "</a></li>";
+          return '<li><a href="#' + encodeURIComponent(item.id) + '" data-open-article="' + escapeHtml(item.id) + '">' +
+            '<img alt="" width="16" height="16" data-side-icon="article" decoding="async" referrerpolicy="no-referrer" />' +
+            "<span>" + escapeHtml(item.title) + "</span></a></li>";
         }).join("");
+        paintSideIcons();
       }
 
       var postsPageIndex = 1;
@@ -5693,7 +6373,9 @@
       function postMetaLine(item) {
         var seed = hashSeed(item.id || item.title);
         var reads = item.reads != null ? item.reads : 40 + (seed % 360);
-        var comments = item.comments != null ? item.comments : seed % 6;
+        var comments = typeof window.__countArticleComments === "function"
+          ? window.__countArticleComments(item.id)
+          : (item.comments != null ? item.comments : 0);
         var likes = item.likes != null ? item.likes : seed % 9;
         var hour = item.hour != null ? item.hour : 9 + (seed % 12);
         var minute = item.minute != null ? item.minute : seed % 60;
@@ -5806,6 +6488,7 @@
           ' data-hans="下一页" data-hant="下一頁">' +
           (root.dataset.script === "hant" ? "下一頁" : "下一页") + "</button>";
         pager.innerHTML = html;
+        if (typeof window.__bindCardTilt === "function") window.__bindCardTilt(list);
       }
 
       function renderArticles() {
@@ -5832,6 +6515,8 @@
         applyArticleFilter();
         if (readingId && !findArticle(readingId)) closeReader(true);
         else if (readingId) openReader(readingId, true);
+        if (typeof window.__paintHomeReveal === "function") window.__paintHomeReveal();
+        else if (typeof window.__bindCardTilt === "function") window.__bindCardTilt(document);
       }
 
       function countArticleWords(text) {
@@ -5875,7 +6560,9 @@
         var hant = root.dataset.script === "hant";
         var seed = hashSeed(item.id || item.title);
         var reads = item.reads != null ? item.reads : 40 + (seed % 360);
-        var comments = item.comments != null ? item.comments : seed % 6;
+        var comments = typeof window.__countArticleComments === "function"
+          ? window.__countArticleComments(item.id)
+          : (item.comments != null ? item.comments : 0);
         var hour = item.hour != null ? item.hour : 9 + (seed % 12);
         var minute = item.minute != null ? item.minute : seed % 60;
         var words = countArticleWords(item.body);
@@ -5910,8 +6597,10 @@
         articlePage.classList.add("is-open");
         articlePage.setAttribute("aria-hidden", "false");
         document.body.classList.add("article-open");
+        if (typeof window.__renderArticleComments === "function") window.__renderArticleComments(id);
         window.scrollTo({ top: 0, behavior: silent ? "auto" : "smooth" });
         if (typeof window.__syncReadProgress === "function") window.__syncReadProgress();
+        if (typeof window.__syncNavChrome === "function") window.__syncNavChrome();
         if (!silent) {
           try {
             history.pushState({ article: id }, "", "#" + encodeURIComponent(id));
@@ -5929,6 +6618,7 @@
         }
         document.body.classList.remove("article-open");
         if (typeof window.__syncReadProgress === "function") window.__syncReadProgress();
+        if (typeof window.__syncNavChrome === "function") window.__syncNavChrome();
         if (!silent) {
           try {
             history.pushState({ article: null }, "", location.pathname + location.search);
@@ -6087,20 +6777,28 @@
       function loadRemoteIcons() {
         var preferred = {
           "www.bilibili.com": [
+            "https://api.iconify.design/simple-icons:bilibili.svg?color=%23FB7299",
+            "https://api.iconify.design/logos:bilibili.svg",
             "https://www.bilibili.com/favicon.ico",
             "https://static.hdslb.com/images/favicon.ico",
             "https://i0.hdslb.com/bfs/static/jinkela/long/images/favicon.ico"
           ],
           "www.baidu.com": [
+            "https://api.iconify.design/simple-icons:baidu.svg?color=%23293194",
+            "https://api.iconify.design/logos:baidu.svg",
             "https://www.baidu.com/favicon.ico",
             "https://dss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/favicon.ico"
           ],
           "github.com": [
+            "https://api.iconify.design/mdi:github.svg?color=%23181717",
+            "https://api.iconify.design/simple-icons:github.svg?color=%23181717",
             "https://github.githubassets.com/favicons/favicon.svg",
             "https://github.githubassets.com/favicons/favicon.png",
             "https://github.com/fluidicon.png"
           ],
           "weixin.qq.com": [
+            "https://api.iconify.design/simple-icons:wechat.svg?color=%2307C160",
+            "https://api.iconify.design/mdi:wechat.svg?color=%2307C160",
             "https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico",
             "https://res.wx.qq.com/a/wx_fed/assets/res/OTE0YTAw.ico"
           ],
@@ -6143,7 +6841,6 @@
 
         function bindIcon(host, img, labelText) {
           if (!host || !img) return;
-          img.removeAttribute("src");
           img.alt = "";
           var sources = crawlSources(host);
           var index = 0;
@@ -6158,28 +6855,17 @@
               finishFallback();
               return;
             }
-            var url = sources[index];
-            var probe = new Image();
-            probe.decoding = "async";
-            probe.referrerPolicy = "no-referrer";
-            probe.onload = function () {
-              // SVG often reports 0x0 before layout; only reject tiny rasters.
-              if (probe.naturalWidth > 0 && probe.naturalWidth < 12) {
-                index += 1;
-                tryNext();
-                return;
-              }
+            img.referrerPolicy = "no-referrer";
+            img.decoding = "async";
+            img.onload = function () {
               img.onerror = null;
               img.onload = null;
-              img.referrerPolicy = "no-referrer";
-              img.decoding = "async";
-              img.src = url;
             };
-            probe.onerror = function () {
+            img.onerror = function () {
               index += 1;
               tryNext();
             };
-            probe.src = /\.svg(\?|$)/i.test(url) ? url : (url + (url.indexOf("?") >= 0 ? "&" : "?") + "_t=" + Date.now().toString(36));
+            img.src = sources[index];
           }
           tryNext();
         }
@@ -6190,6 +6876,176 @@
           var label = link.querySelector(".ios-dock-label, span:not(.ios-dock-icon)");
           bindIcon(host, img, label ? label.textContent : "");
         });
+
+        var sideIcons = {
+          links: [
+            "https://api.iconify.design/fluent-emoji:globe-showing-asia-australia.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f30f.png",
+            "https://api.iconify.design/twemoji:globe-showing-asia-australia.svg"
+          ],
+          calendar: [
+            "https://api.iconify.design/fluent-emoji:tear-off-calendar.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4c6.png",
+            "https://api.iconify.design/twemoji:tear-off-calendar.svg"
+          ],
+          search: [
+            "https://api.iconify.design/fluent-emoji:magnifying-glass-tilted-left.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f50d.png",
+            "https://api.iconify.design/twemoji:magnifying-glass-tilted-left.svg"
+          ],
+          baidu: [
+            "https://api.iconify.design/simple-icons:baidu.svg?color=%23293194",
+            "https://api.iconify.design/logos:baidu.svg",
+            "https://www.baidu.com/favicon.ico"
+          ],
+          latest: [
+            "https://api.iconify.design/fluent-emoji:newspaper.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4f0.png",
+            "https://api.iconify.design/twemoji:newspaper.svg"
+          ],
+          tags: [
+            "https://api.iconify.design/fluent-emoji:label.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3f7.png",
+            "https://api.iconify.design/twemoji:label.svg"
+          ],
+          "cal-prev": [
+            "https://api.iconify.design/fluent-emoji:left-arrow.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2b05.png",
+            "https://api.iconify.design/twemoji:left-arrow.svg"
+          ],
+          "cal-next": [
+            "https://api.iconify.design/fluent-emoji:right-arrow.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/27a1.png",
+            "https://api.iconify.design/twemoji:right-arrow.svg"
+          ],
+          go: [
+            "https://api.iconify.design/fluent-emoji:sparkles.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/2728.png",
+            "https://api.iconify.design/twemoji:sparkles.svg"
+          ],
+          article: [
+            "https://api.iconify.design/fluent-emoji:page-facing-up.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4c4.png",
+            "https://api.iconify.design/twemoji:page-facing-up.svg"
+          ]
+        };
+
+        paintSideIcons = function () {
+          document.querySelectorAll("[data-side-icon]").forEach(function (img) {
+            if (img.getAttribute("src")) return;
+            var key = img.getAttribute("data-side-icon");
+            bindSources(img, sideIcons[key], "");
+          });
+        };
+
+        var topIcons = {
+          home: [
+            "https://api.iconify.design/fluent-emoji:house.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3e0.png",
+            "https://api.iconify.design/twemoji:house.svg"
+          ],
+          about: [
+            "https://api.iconify.design/fluent-emoji:person.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f464.png",
+            "https://api.iconify.design/twemoji:bust-in-silhouette.svg"
+          ],
+          articles: [
+            "https://api.iconify.design/fluent-emoji:page-facing-up.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4c4.png",
+            "https://api.iconify.design/twemoji:page-facing-up.svg"
+          ],
+          tags: [
+            "https://api.iconify.design/fluent-emoji:label.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3f7.png",
+            "https://api.iconify.design/twemoji:label.svg"
+          ],
+          links: [
+            "https://api.iconify.design/fluent-emoji:link.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f517.png",
+            "https://api.iconify.design/twemoji:link.svg"
+          ],
+          guestbook: [
+            "https://api.iconify.design/fluent-emoji:speech-balloon.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4ac.png",
+            "https://api.iconify.design/twemoji:speech-balloon.svg"
+          ],
+          admin: [
+            "https://api.iconify.design/fluent-emoji:laptop.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4bb.png",
+            "https://api.iconify.design/twemoji:laptop.svg"
+          ]
+        };
+
+        function bindSources(img, sources, fallback) {
+          if (!img || !sources || !sources.length) return;
+          var index = 0;
+          function tryNext() {
+            if (index >= sources.length) {
+              img.onerror = null;
+              img.onload = null;
+              if (fallback) img.alt = fallback;
+              return;
+            }
+            img.referrerPolicy = "no-referrer";
+            img.decoding = "async";
+            img.onload = function () {
+              img.onerror = null;
+              img.onload = null;
+            };
+            img.onerror = function () {
+              index += 1;
+              tryNext();
+            };
+            img.src = sources[index];
+          }
+          tryNext();
+        }
+
+        document.querySelectorAll(".topbar-link[data-top-icon]").forEach(function (btn) {
+          var key = btn.getAttribute("data-top-icon");
+          var img = btn.querySelector("img");
+          var label = btn.querySelector("span");
+          bindSources(img, topIcons[key], label ? label.textContent : "");
+        });
+
+        var catIcons = {
+          music: [
+            "https://api.iconify.design/fluent-emoji:musical-notes.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3b5.png",
+            "https://api.iconify.design/twemoji:musical-notes.svg"
+          ],
+          quote: [
+            "https://api.iconify.design/fluent-emoji:speech-balloon.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4ac.png",
+            "https://api.iconify.design/twemoji:speech-balloon.svg"
+          ],
+          skin: [
+            "https://api.iconify.design/fluent-emoji:cat-face.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f431.png",
+            "https://api.iconify.design/twemoji:cat-face.svg"
+          ],
+          shot: [
+            "https://api.iconify.design/fluent-emoji:camera-with-flash.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4f8.png",
+            "https://api.iconify.design/twemoji:camera-with-flash.svg"
+          ],
+          hide: [
+            "https://api.iconify.design/fluent-emoji:see-no-evil-monkey.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f648.png",
+            "https://api.iconify.design/twemoji:see-no-evil-monkey.svg"
+          ],
+          restore: [
+            "https://api.iconify.design/fluent-emoji:cat.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f408.png",
+            "https://api.iconify.design/twemoji:cat.svg"
+          ]
+        };
+
+        document.querySelectorAll("[data-cat-icon]").forEach(function (btn) {
+          var key = btn.getAttribute("data-cat-icon");
+          bindSources(btn.querySelector("img"), catIcons[key], btn.getAttribute("aria-label") || "");
+        });
+        paintSideIcons();
 
         (function loadEggPlaneArt() {
           var img = document.getElementById("egg-plane-img");
@@ -6688,6 +7544,7 @@
           linksPage.setAttribute("aria-hidden", "false");
           document.body.classList.add("links-open");
           if (typeof window.__renderFriendLinks === "function") window.__renderFriendLinks();
+          if (typeof window.__renderGuestbook === "function") window.__renderGuestbook();
           window.scrollTo({ top: 0, behavior: "smooth" });
           if (window.__syncReadProgress) window.__syncReadProgress();
         }
@@ -6698,10 +7555,8 @@
 
       (function setupGuestbookPage() {
         var guestbookPage = document.getElementById("guestbook-page");
-        var guestbookForm = document.getElementById("guestbook-form");
-        var guestbookList = document.getElementById("guestbook-list");
         var GUESTBOOK_KEY = "blank-guestbook";
-        if (!guestbookPage || !guestbookForm || !guestbookList) return;
+        if (!guestbookPage) return;
 
         function defaultGuestbook() {
           return [
@@ -6742,23 +7597,26 @@
             " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
         }
 
+        function itemHtml(item) {
+          return (
+            '<li class="guestbook-item' + (item.host ? " is-host" : "") + '">' +
+              '<div class="guestbook-item-head">' +
+                '<span class="guestbook-item-name">' + escapeHtml(item.name) + "</span>" +
+                '<span class="guestbook-item-time">' + escapeHtml(formatGuestbookTime(item.time)) + "</span>" +
+              "</div>" +
+              '<p class="guestbook-item-body">' + escapeHtml(item.body) + "</p>" +
+            "</li>"
+          );
+        }
+
         function renderGuestbook() {
           var items = loadGuestbook();
-          if (!items.length) {
-            guestbookList.innerHTML = '<li class="guestbook-empty" data-hans="还没有留言" data-hant="還沒有留言">还没有留言</li>';
-            return;
-          }
-          guestbookList.innerHTML = items.map(function (item) {
-            return (
-              '<li class="guestbook-item' + (item.host ? " is-host" : "") + '">' +
-                '<div class="guestbook-item-head">' +
-                  '<span class="guestbook-item-name">' + escapeHtml(item.name) + "</span>" +
-                  '<span class="guestbook-item-time">' + escapeHtml(formatGuestbookTime(item.time)) + "</span>" +
-                "</div>" +
-                '<p class="guestbook-item-body">' + escapeHtml(item.body) + "</p>" +
-              "</li>"
-            );
-          }).join("");
+          var html = items.length
+            ? items.map(itemHtml).join("")
+            : '<li class="guestbook-empty" data-hans="还没有留言" data-hant="還沒有留言">还没有留言</li>';
+          document.querySelectorAll("[data-guestbook-list]").forEach(function (list) {
+            list.innerHTML = html;
+          });
           if (typeof applyCopy === "function") applyCopy(root.dataset.script || "hans");
         }
 
@@ -6812,17 +7670,19 @@
           window.setTimeout(function () { toast.classList.remove("is-on"); }, 1800);
         }
 
-        guestbookForm.addEventListener("submit", function (event) {
+        function handleGuestbookSubmit(event) {
           event.preventDefault();
-          var name = (document.getElementById("guestbook-name").value || "").trim();
-          var body = (document.getElementById("guestbook-body").value || "").trim();
+          var form = event.currentTarget;
+          var nameInput = form.querySelector('[name="name"]');
+          var bodyInput = form.querySelector('[name="body"]');
+          var name = ((nameInput && nameInput.value) || "").trim();
+          var body = ((bodyInput && bodyInput.value) || "").trim();
           var hant = root.dataset.script === "hant";
           if (!name || !body) return;
           if (isOwnerName(name) && !isAdminUnlocked()) {
             showGuestbookToast(hant
               ? "「wangyutang」為保留名，請先後台登錄"
               : "「wangyutang」为保留名，请先后台登录");
-            var nameInput = document.getElementById("guestbook-name");
             if (nameInput) nameInput.focus();
             return;
           }
@@ -6835,8 +7695,31 @@
             host: isOwnerName(name) && isAdminUnlocked()
           });
           saveGuestbook(items);
-          guestbookForm.reset();
+          document.querySelectorAll("[data-guestbook-form]").forEach(function (node) { node.reset(); });
           renderGuestbook();
+          showGuestbookToast(hant ? "留言已送出" : "留言已送出");
+        }
+
+        document.querySelectorAll("[data-guestbook-form]").forEach(function (form) {
+          form.addEventListener("submit", handleGuestbookSubmit);
+        });
+
+        document.addEventListener("click", function (event) {
+          var scrollBtn = event.target.closest("[data-scroll-to]");
+          if (!scrollBtn) return;
+          var targetId = scrollBtn.getAttribute("data-scroll-to");
+          if (!targetId) return;
+          event.preventDefault();
+          function jump() {
+            var node = document.getElementById(targetId);
+            if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+          if (!document.body.classList.contains("links-open") && window.__openLinksPage) {
+            window.__openLinksPage();
+            window.setTimeout(jump, 120);
+          } else {
+            jump();
+          }
         });
 
         if (!localStorage.getItem(GUESTBOOK_KEY)) saveGuestbook(defaultGuestbook());
@@ -6844,6 +7727,143 @@
         window.__openGuestbookPage = openGuestbook;
         window.__closeGuestbookPage = closeGuestbook;
         window.__renderGuestbook = renderGuestbook;
+      })();
+
+      (function setupArticleComments() {
+        var COMMENT_KEY = "blank-article-comments";
+        var form = document.getElementById("article-comment-form");
+        var list = document.getElementById("article-comment-list");
+        var countNode = document.getElementById("article-comments-count");
+        if (!form || !list) return;
+
+        function loadAll() {
+          try {
+            var raw = localStorage.getItem(COMMENT_KEY);
+            if (!raw) return {};
+            var parsed = JSON.parse(raw);
+            return parsed && typeof parsed === "object" ? parsed : {};
+          } catch (error) {
+            return {};
+          }
+        }
+
+        function saveAll(map) {
+          try {
+            localStorage.setItem(COMMENT_KEY, JSON.stringify(map || {}));
+          } catch (error) {}
+          if (typeof window.__notifyDataChanged === "function") window.__notifyDataChanged("articleComments");
+        }
+
+        function getComments(articleId) {
+          var map = loadAll();
+          var items = map[articleId];
+          return Array.isArray(items) ? items.filter(function (item) {
+            return item && item.id && item.name && item.body;
+          }) : [];
+        }
+
+        function countComments(articleId) {
+          return getComments(articleId).length;
+        }
+
+        function formatTime(ts) {
+          var d = new Date(ts || Date.now());
+          return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) +
+            " " + pad2(d.getHours()) + ":" + pad2(d.getMinutes());
+        }
+
+        function normalizeGuestName(value) {
+          return String(value || "").replace(/\s+/g, "").toLowerCase();
+        }
+
+        function isOwnerName(value) {
+          return normalizeGuestName(value) === "wangyutang";
+        }
+
+        function isAdminUnlocked() {
+          if (typeof window.__isAdminUnlocked === "function") return !!window.__isAdminUnlocked();
+          try {
+            return sessionStorage.getItem("blank-admin-auth") === "1";
+          } catch (error) {
+            return false;
+          }
+        }
+
+        function showToast(text) {
+          var toast = document.getElementById("ctx-toast");
+          if (!toast) return;
+          toast.textContent = text;
+          toast.classList.add("is-on");
+          window.setTimeout(function () { toast.classList.remove("is-on"); }, 1800);
+        }
+
+        function render(articleId) {
+          var id = articleId || readingId;
+          if (!id) {
+            list.innerHTML = "";
+            if (countNode) countNode.textContent = "0";
+            return;
+          }
+          var items = getComments(id);
+          if (countNode) countNode.textContent = String(items.length);
+          var commentsNode = document.getElementById("reader-comments");
+          if (commentsNode) commentsNode.textContent = String(items.length);
+          if (!items.length) {
+            list.innerHTML = '<li class="guestbook-empty" data-hans="还没有留言，来抢沙发吧" data-hant="還沒有留言，來搶沙發吧">还没有留言，来抢沙发吧</li>';
+          } else {
+            list.innerHTML = items.map(function (item) {
+              return (
+                '<li class="guestbook-item' + (item.host ? " is-host" : "") + '">' +
+                  '<div class="guestbook-item-head">' +
+                    '<span class="guestbook-item-name">' + escapeHtml(item.name) + "</span>" +
+                    '<span class="guestbook-item-time">' + escapeHtml(formatTime(item.time)) + "</span>" +
+                  "</div>" +
+                  '<p class="guestbook-item-body">' + escapeHtml(item.body) + "</p>" +
+                "</li>"
+              );
+            }).join("");
+          }
+          if (typeof applyCopy === "function") applyCopy(root.dataset.script || "hans");
+        }
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+          if (!readingId) return;
+          var name = (document.getElementById("article-comment-name").value || "").trim();
+          var body = (document.getElementById("article-comment-body").value || "").trim();
+          var hant = root.dataset.script === "hant";
+          if (!name || !body) return;
+          if (isOwnerName(name) && !isAdminUnlocked()) {
+            showToast(hant
+              ? "「wangyutang」為保留名，請先後台登錄"
+              : "「wangyutang」为保留名，请先后台登录");
+            return;
+          }
+          var map = loadAll();
+          var items = Array.isArray(map[readingId]) ? map[readingId].slice() : [];
+          items.unshift({
+            id: "c-" + Date.now().toString(36),
+            name: name.slice(0, 24),
+            body: body.slice(0, 500),
+            time: Date.now(),
+            host: isOwnerName(name) && isAdminUnlocked()
+          });
+          map[readingId] = items;
+          saveAll(map);
+          form.reset();
+          render(readingId);
+          if (typeof renderPostsPage === "function") renderPostsPage();
+          showToast(hant ? "留言已發表" : "留言已发表");
+        });
+
+        window.__countArticleComments = countComments;
+        window.__renderArticleComments = render;
+        window.__applyArticleComments = function (map) {
+          saveAll(map && typeof map === "object" ? map : {});
+          if (readingId) render(readingId);
+          if (typeof renderPostsPage === "function") renderPostsPage();
+        };
+        window.__readArticleComments = loadAll;
       })();
 
       (function setupAdminPage() {
@@ -6968,6 +7988,7 @@
               "</li>"
             );
           }).join("");
+          if (typeof window.__bindCardTilt === "function") window.__bindCardTilt(friendGrid);
         }
 
         function renderAdminArticles() {
@@ -7204,6 +8225,7 @@
         var SYNC_META_KEY = "blank-sync-meta";
         var ARTICLE_KEY_SYNC = "blank-articles";
         var GUESTBOOK_KEY_SYNC = "blank-guestbook";
+        var COMMENTS_KEY_SYNC = "blank-article-comments";
         var LINKS_KEY_SYNC = "blank-friend-links";
         var statusEl = document.getElementById("admin-sync-status");
         var idInput = document.getElementById("admin-sync-id");
@@ -7266,6 +8288,9 @@
             updatedAt: Date.now(),
             articles: Array.isArray(articles) ? articles : readJsonKey(ARTICLE_KEY_SYNC, []),
             guestbook: readJsonKey(GUESTBOOK_KEY_SYNC, []),
+            articleComments: typeof window.__readArticleComments === "function"
+              ? window.__readArticleComments()
+              : readJsonKey(COMMENTS_KEY_SYNC, {}),
             friendLinks: readJsonKey(LINKS_KEY_SYNC, []),
             theme: root.dataset.theme || "light",
             script: root.dataset.script || "hans"
@@ -7288,6 +8313,13 @@
             if (Array.isArray(snapshot.guestbook)) {
               try { localStorage.setItem(GUESTBOOK_KEY_SYNC, JSON.stringify(snapshot.guestbook)); } catch (error) {}
               if (typeof window.__renderGuestbook === "function") window.__renderGuestbook();
+            }
+            if (snapshot.articleComments && typeof snapshot.articleComments === "object") {
+              if (typeof window.__applyArticleComments === "function") {
+                window.__applyArticleComments(snapshot.articleComments);
+              } else {
+                try { localStorage.setItem(COMMENTS_KEY_SYNC, JSON.stringify(snapshot.articleComments)); } catch (error) {}
+              }
             }
             if (Array.isArray(snapshot.friendLinks) && typeof window.__applyFriendLinks === "function") {
               window.__applyFriendLinks(snapshot.friendLinks);
@@ -7917,7 +8949,6 @@
 
       (function setupReadProgress() {
         var bar = document.querySelector("#read-progress > span");
-        var page = document.getElementById("article-page");
         if (!bar) return;
         function syncProgress() {
           var scrolled = window.scrollY || document.documentElement.scrollTop || 0;
@@ -7930,12 +8961,127 @@
         window.__syncReadProgress = syncProgress;
       })();
 
+      (function setupImmersion() {
+        var topbar = document.querySelector(".topbar");
+        var body = document.body;
+        var navMap = {
+          home: function () {
+            return !body.classList.contains("about-open") &&
+              !body.classList.contains("posts-open") &&
+              !body.classList.contains("tags-open") &&
+              !body.classList.contains("links-open") &&
+              !body.classList.contains("guestbook-open") &&
+              !body.classList.contains("admin-open") &&
+              !body.classList.contains("article-open");
+          },
+          about: function () { return body.classList.contains("about-open"); },
+          articles: function () { return body.classList.contains("posts-open") || body.classList.contains("article-open"); },
+          tags: function () { return body.classList.contains("tags-open"); },
+          links: function () { return body.classList.contains("links-open"); },
+          guestbook: function () { return body.classList.contains("guestbook-open"); },
+          admin: function () { return body.classList.contains("admin-open"); }
+        };
+
+        function syncNav() {
+          document.querySelectorAll(".topbar-link[data-nav]").forEach(function (btn) {
+            var key = btn.getAttribute("data-nav");
+            var on = typeof navMap[key] === "function" ? navMap[key]() : false;
+            btn.classList.toggle("is-active", !!on);
+            if (on) btn.setAttribute("aria-current", "page");
+            else btn.removeAttribute("aria-current");
+          });
+        }
+
+        function syncTopbar() {
+          if (!topbar) return;
+          topbar.classList.toggle("is-compact", (window.scrollY || 0) > 48);
+          document.documentElement.style.setProperty("--scroll-y", String(window.scrollY || 0));
+        }
+
+        var gazeRaf = 0;
+        var gazeX = 50;
+        var gazeY = 30;
+        function flushGaze() {
+          gazeRaf = 0;
+          body.style.setProperty("--gaze-x", gazeX.toFixed(1) + "%");
+          body.style.setProperty("--gaze-y", gazeY.toFixed(1) + "%");
+        }
+        function setGaze(clientX, clientY) {
+          gazeX = (clientX / Math.max(1, window.innerWidth)) * 100;
+          gazeY = (clientY / Math.max(1, window.innerHeight)) * 100;
+          if (!gazeRaf) gazeRaf = requestAnimationFrame(flushGaze);
+        }
+
+        function bindTilt(rootNode) {
+          if (reduceMotion || !fine || !rootNode) return;
+          var cards = rootNode.querySelectorAll(".article-item-card, .posts-item-btn, .friend-link-card, .side-link");
+          cards.forEach(function (card) {
+            if (card.__tiltBound) return;
+            card.__tiltBound = true;
+            card.addEventListener("pointermove", function (event) {
+              var rect = card.getBoundingClientRect();
+              var px = (event.clientX - rect.left) / Math.max(1, rect.width);
+              var py = (event.clientY - rect.top) / Math.max(1, rect.height);
+              var rx = ((0.5 - py) * 7).toFixed(2) + "deg";
+              var ry = ((px - 0.5) * 9).toFixed(2) + "deg";
+              card.style.setProperty("--tilt-x", rx);
+              card.style.setProperty("--tilt-y", ry);
+              card.style.setProperty("--tilt-lift", "-5px");
+            });
+            card.addEventListener("pointerleave", function () {
+              card.style.setProperty("--tilt-x", "0deg");
+              card.style.setProperty("--tilt-y", "0deg");
+              card.style.setProperty("--tilt-lift", "0px");
+            });
+          });
+        }
+
+        function revealNodes(nodes) {
+          if (!nodes || !nodes.length) return;
+          if (reduceMotion) {
+            nodes.forEach(function (node) { node.classList.add("is-in"); });
+            return;
+          }
+          nodes.forEach(function (node, index) {
+            node.classList.add("is-reveal");
+            window.setTimeout(function () {
+              node.classList.add("is-in");
+            }, 40 + index * 70);
+          });
+        }
+
+        function paintHomeReveal() {
+          revealNodes(Array.prototype.slice.call(document.querySelectorAll(".article-item:not(.is-reveal), .side-block:not(.is-reveal), .verse:not(.is-reveal)")));
+          bindTilt(document);
+        }
+
+        window.__syncNavChrome = syncNav;
+        window.__bindCardTilt = bindTilt;
+        window.__paintHomeReveal = paintHomeReveal;
+
+        window.addEventListener("scroll", syncTopbar, { passive: true });
+        if (fine && !reduceMotion) {
+          window.addEventListener("pointermove", function (event) {
+            setGaze(event.clientX, event.clientY);
+          }, { passive: true });
+        }
+        syncTopbar();
+        syncNav();
+
+        var observer = new MutationObserver(function () {
+          syncNav();
+        });
+        observer.observe(body, { attributes: true, attributeFilter: ["class"] });
+
+        window.setTimeout(paintHomeReveal, 60);
+      })();
+
       if (fine) {
       var cursor = document.getElementById("cursor");
       var halo = document.getElementById("halo");
       root.classList.add("has-cursor");
       var hx = -80, hy = -80, tx = -80, ty = -80, placed = false;
-      var haloEase = 0.22;
+      var haloEase = 0.5;
       var fxRaf = 0;
       var cursorLive = false;
       var cursorX = -100;
@@ -7948,10 +9094,13 @@
       var lastModeAt = 0;
       var lastMode = "arrow";
 
+      var lastDustAt = 0;
+      var pendingModeNode = null;
+
       if (!reduceMotion) {
         var dustLayer = document.getElementById("cursor-dust");
         if (dustLayer) {
-          for (var di = 0; di < 18; di += 1) {
+          for (var di = 0; di < 16; di += 1) {
             var dustNode = document.createElement("i");
             dustLayer.appendChild(dustNode);
             dustPool.push({ el: dustNode, life: 0, x: 0, y: 0, vx: 0, vy: 0, size: 1, spin: 0 });
@@ -7965,49 +9114,59 @@
         dustIdx += 1;
         if (p.life <= 0) dustAlive += 1;
         var angle = Math.random() * Math.PI * 2;
-        var kick = 0.35 + Math.random() * 0.9 + speed * 0.035;
-        p.x = x + (Math.random() - 0.5) * 8;
-        p.y = y + (Math.random() - 0.5) * 8;
-        p.vx = Math.cos(angle) * kick * 0.4;
-        p.vy = Math.sin(angle) * kick * 0.4 - 0.28;
+        var kick = 0.28 + Math.random() * 0.7 + speed * 0.028;
+        p.x = x + (Math.random() - 0.5) * 6;
+        p.y = y + (Math.random() - 0.5) * 6;
+        p.vx = Math.cos(angle) * kick * 0.32;
+        p.vy = Math.sin(angle) * kick * 0.32 - 0.28;
         p.life = 1;
-        p.size = 0.5 + Math.random() * 1.05;
-        p.spin = (Math.random() - 0.5) * 14;
+        p.size = 0.55 + Math.random() * 0.95;
+        p.spin = (Math.random() - 0.5) * 12;
         p.el.className = kind || "";
-        p.el.style.opacity = "0.9";
+        p.el.style.opacity = "1";
       }
 
-      function tickFx() {
-        fxRaf = 0;
-        hx += (tx - hx) * haloEase;
-        hy += (ty - hy) * haloEase;
-        halo.style.setProperty("--x", hx + "px");
-        halo.style.setProperty("--y", hy + "px");
+      function placeCursor(x, y) {
+        cursor.style.transform = "translate3d(" + x + "px," + y + "px,0)";
+      }
 
-        var needMore = Math.abs(tx - hx) > 0.08 || Math.abs(ty - hy) > 0.08;
+      function placeHalo(x, y) {
+        halo.style.transform = "translate3d(" + x + "px," + y + "px,0)" + (halo.classList.contains("is-down") ? " scale(0.62)" : "");
+      }
+
+      function tickFx(ts) {
+        fxRaf = 0;
+        var ease = haloEase;
+        hx += (tx - hx) * ease;
+        hy += (ty - hy) * ease;
+        if (Math.abs(tx - hx) < 0.2) hx = tx;
+        if (Math.abs(ty - hy) < 0.2) hy = ty;
+        placeHalo(hx, hy);
+
+        var needMore = Math.abs(tx - hx) > 0.15 || Math.abs(ty - hy) > 0.15;
 
         if (dustPool.length && cursorLive) {
           var dx = cursorX - prevX;
           var dy = cursorY - prevY;
           var speed = Math.sqrt(dx * dx + dy * dy);
-          if (speed > 1.4) {
-            var count = speed > 24 ? 2 : 1;
+          if (speed > 2.4 && (!lastDustAt || ts - lastDustAt > 18)) {
+            lastDustAt = ts;
+            var count = speed > 28 ? 2 : 1;
             for (var s = 0; s < count; s += 1) {
               var roll = Math.random();
-              spawnDust(cursorX - dx * 0.12, cursorY - dy * 0.12, speed, roll > 0.78 ? "is-gem" : roll > 0.58 ? "is-ink" : "");
+              spawnDust(cursorX - dx * 0.2, cursorY - dy * 0.2, speed, roll > 0.72 ? "is-gem" : roll > 0.5 ? "is-ink" : "");
             }
-            needMore = true;
           }
           prevX = cursorX;
           prevY = cursorY;
           for (var i = 0; i < dustPool.length; i += 1) {
             var p = dustPool[i];
             if (p.life <= 0) continue;
-            p.life -= 0.028;
+            p.life -= 0.04;
             p.x += p.vx;
             p.y += p.vy;
-            p.vy += 0.016;
-            p.vx *= 0.98;
+            p.vy += 0.014;
+            p.vx *= 0.97;
             if (p.life <= 0) {
               p.el.style.opacity = "0";
               dustAlive = Math.max(0, dustAlive - 1);
@@ -8015,12 +9174,12 @@
             }
             needMore = true;
             var rot = p.el.classList.contains("is-gem") ? 45 + p.spin : p.spin;
-            p.el.style.opacity = String(Math.max(0, p.life * 0.85));
-            p.el.style.transform = "translate3d(" + p.x.toFixed(1) + "px," + p.y.toFixed(1) + "px,0) rotate(" + rot.toFixed(1) + "deg) scale(" + (p.size * (0.35 + p.life * 0.65)).toFixed(2) + ")";
+            p.el.style.opacity = String(Math.max(0, p.life * 0.8));
+            p.el.style.transform = "translate3d(" + (p.x | 0) + "px," + (p.y | 0) + "px,0) rotate(" + (rot | 0) + "deg) scale(" + (p.size * (0.35 + p.life * 0.65)).toFixed(2) + ")";
           }
         }
 
-        if (needMore || (cursorLive && dustAlive > 0)) {
+        if (needMore || (cursorLive && dustAlive > 0) || cursorLive) {
           fxRaf = requestAnimationFrame(tickFx);
         }
       }
@@ -8030,17 +9189,18 @@
       }
 
       function burst(x, y) {
+        if (reduceMotion) return;
         var old = document.querySelectorAll(".click-burst");
-        if (old.length > 3) old[0].remove();
+        if (old.length > 2) old[0].remove();
         var node = document.createElement("div");
         node.className = "click-burst";
         node.style.setProperty("--x", x + "px");
         node.style.setProperty("--y", y + "px");
         var sparks = [];
-        var count = 5;
+        var count = 7;
         for (var i = 0; i < count; i += 1) {
-          var angle = (-Math.PI / 2) + (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.28;
-          var dist = 22 + Math.random() * 16;
+          var angle = (-Math.PI / 2) + (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.18;
+          var dist = 20 + Math.random() * 18;
           var dx = Math.cos(angle) * dist;
           var dy = Math.sin(angle) * dist;
           var cls = i % 3 === 0 ? "spark ink" : i % 3 === 1 ? "spark soft" : "spark";
@@ -8052,11 +9212,15 @@
           '<span class="wave wave-soft"></span>'
         ].concat(sparks).join("");
         document.body.appendChild(node);
-        window.setTimeout(function () { node.remove(); }, 700);
+        window.setTimeout(function () { node.remove(); }, 640);
+        for (var b = 0; b < 4; b += 1) {
+          spawnDust(x, y, 14, b % 2 ? "is-gem" : "is-ink");
+        }
+        kickFx();
       }
 
-      var pointerSelector = "a, button, .dock-item, .weather, .verse, .side-link, .calendar, .side-search, .side-tag, .back-top, .egg-launch, .ios-dock-app, .ctx-item, .article-item-card, .board-action, .topbar-link, #live2dcanvas, #live2d-widget, .live2d-widget-container, .cat-bar button, .cat-restore";
-      var textSelector = "input, textarea, [contenteditable], p, .article-excerpt, .article-title";
+      var pointerSelector = "a, button, .dock-item, .weather, .verse, .side-link, .calendar, .side-search, .side-tag, .back-top, .egg-launch, .ios-dock-app, .ctx-item, .article-item-card, .posts-item-btn, .board-action, .topbar-link, .friend-link-card, .guestbook-item, #live2dcanvas, #live2d-widget, .live2d-widget-container, .cat-bar button, .cat-restore";
+      var textSelector = "input, textarea, [contenteditable], .article-reader-body, .article-excerpt, .article-title";
 
       function modeFrom(node) {
         if (!node || node.nodeType !== 1) return "arrow";
@@ -8065,40 +9229,17 @@
         return "arrow";
       }
 
-      document.addEventListener("mousemove", function (event) {
-        cursorX = event.clientX;
-        cursorY = event.clientY;
-        cursorLive = true;
-        var now = performance.now();
-        var mode = lastMode;
-        if (now - lastModeAt > 48) {
-          mode = modeFrom(document.elementFromPoint(event.clientX, event.clientY));
-          lastMode = mode;
-          lastModeAt = now;
-        }
+      document.addEventListener("pointermove", function (event) {
         var mx = event.clientX;
         var my = event.clientY;
-
-        if (mode === "pointer" && !reduceMotion) {
-          var target = document.elementFromPoint(mx, my);
-          var hit = target && target.closest(pointerSelector);
-          if (hit) {
-            var rect = hit.getBoundingClientRect();
-            var cx = rect.left + rect.width / 2;
-            var cy = rect.top + rect.height / 2;
-            mx += (cx - mx) * 0.1;
-            my += (cy - my) * 0.1;
-          }
-          haloEase = 0.3;
-        } else {
-          haloEase = mode === "text" ? 0.24 : 0.2;
-        }
-
-        cursor.style.setProperty("--x", mx + "px");
-        cursor.style.setProperty("--y", my + "px");
+        cursorX = mx;
+        cursorY = my;
+        cursorLive = true;
+        placeCursor(mx, my);
         if (!placed) {
           hx = tx = mx;
           hy = ty = my;
+          placeHalo(mx, my);
           placed = true;
         } else {
           tx = mx;
@@ -8106,21 +9247,34 @@
         }
         cursor.classList.add("is-on");
         halo.classList.add("is-on");
-        cursor.dataset.mode = mode;
-        halo.classList.toggle("is-arrow", mode === "arrow");
-        halo.classList.toggle("is-pointer", mode === "pointer");
+
+        var now = performance.now();
+        if (now - lastModeAt > 72) {
+          pendingModeNode = event.target;
+          var mode = modeFrom(pendingModeNode);
+          if (mode !== lastMode) {
+            lastMode = mode;
+            cursor.dataset.mode = mode;
+            halo.classList.toggle("is-arrow", mode === "arrow");
+            halo.classList.toggle("is-pointer", mode === "pointer");
+          }
+          haloEase = mode === "pointer" ? 0.48 : mode === "text" ? 0.4 : 0.52;
+          lastModeAt = now;
+        }
         kickFx();
       }, { passive: true });
 
-      document.addEventListener("mousedown", function (event) {
+      document.addEventListener("pointerdown", function (event) {
         cursor.classList.add("is-down");
         halo.classList.add("is-down");
+        placeHalo(hx, hy);
         burst(event.clientX, event.clientY);
       });
 
-      document.addEventListener("mouseup", function () {
+      document.addEventListener("pointerup", function () {
         cursor.classList.remove("is-down");
         halo.classList.remove("is-down");
+        placeHalo(hx, hy);
       });
 
       root.addEventListener("mouseleave", function () {
@@ -8211,29 +9365,89 @@
   <div class="cat-ui" id="cat-ui" aria-label="猫栏">
     <div class="cat-bubble" id="cat-bubble" aria-live="polite">你要干嘛呀？</div>
     <div class="cat-bar" id="cat-bar">
-      <button type="button" data-cat="music" data-label-hans="随机歌曲" data-label-hant="隨機歌曲" aria-label="随机歌曲" title="随机歌曲">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M7.2 13.2a2.2 2.2 0 1 1-1.6-2.1V4.4l8-1.4v7.6a2.2 2.2 0 1 1-1.5-2.1V5.2L7.2 6.3v6.9Z" fill="currentColor"/></svg>
+      <button type="button" data-cat="music" data-cat-icon="music" data-label-hans="随机歌曲" data-label-hant="隨機歌曲" aria-label="随机歌曲" title="随机歌曲">
+        <img alt="" width="24" height="24" decoding="async" referrerpolicy="no-referrer" />
       </button>
-      <button type="button" data-cat="quote" data-label-hans="随机一言" data-label-hant="隨機一言" aria-label="随机一言" title="随机一言">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3.2 3.4h11.6v8.2H8.1L5 14.2v-2.6H3.2V3.4Z" fill="currentColor"/></svg>
+      <button type="button" data-cat="quote" data-cat-icon="quote" data-label-hans="随机一言" data-label-hant="隨機一言" aria-label="随机一言" title="随机一言">
+        <img alt="" width="24" height="24" decoding="async" referrerpolicy="no-referrer" />
       </button>
-      <button type="button" data-cat="skin" data-label-hans="换毛色" data-label-hant="換毛色" aria-label="换毛色" title="换毛色">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.6c2.8 0 5 2.4 5 5.4 0 2.2-1.2 3.5-2.4 4.5-.7.6-1.2 1.2-1.2 2h-2.8c0-.8-.5-1.4-1.2-2C5.2 11.5 4 10.2 4 8c0-3 2.2-5.4 5-5.4Z" fill="currentColor"/><circle cx="7.2" cy="7.6" r="0.9" fill="#fffef8"/><circle cx="10.8" cy="7.6" r="0.9" fill="#fffef8"/></svg>
+      <button type="button" data-cat="skin" data-cat-icon="skin" data-label-hans="换毛色" data-label-hant="換毛色" aria-label="换毛色" title="换毛色">
+        <img alt="" width="24" height="24" decoding="async" referrerpolicy="no-referrer" />
       </button>
-      <button type="button" data-cat="shot" data-label-hans="给猫拍照" data-label-hant="給貓拍照" aria-label="给猫拍照" title="给猫拍照">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M6.2 3.4h5.6l1.1 1.6H15a1.4 1.4 0 0 1 1.4 1.4v7.2A1.4 1.4 0 0 1 15 15H3a1.4 1.4 0 0 1-1.4-1.4V6.4A1.4 1.4 0 0 1 3 5h2.1L6.2 3.4Z" fill="currentColor"/><circle cx="9" cy="9.6" r="2.6" fill="#fffef8"/></svg>
+      <button type="button" data-cat="shot" data-cat-icon="shot" data-label-hans="给猫拍照" data-label-hant="給貓拍照" aria-label="给猫拍照" title="给猫拍照">
+        <img alt="" width="24" height="24" decoding="async" referrerpolicy="no-referrer" />
       </button>
-      <button type="button" data-cat="hide" data-label-hans="暂时藏起" data-label-hant="暫時藏起" aria-label="暂时藏起" title="暂时藏起">
-        <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4.2 4.2 13.8 13.8M13.8 4.2 4.2 13.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <button type="button" data-cat="hide" data-cat-icon="hide" data-label-hans="暂时藏起" data-label-hant="暫時藏起" aria-label="暂时藏起" title="暂时藏起">
+        <img alt="" width="24" height="24" decoding="async" referrerpolicy="no-referrer" />
       </button>
     </div>
   </div>
-  <button class="cat-restore" id="cat-restore" type="button" hidden data-label-hans="召回小猫" data-label-hant="召回小貓" aria-label="召回小猫" title="召回小猫">
-    <svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="8.2" r="4.4" fill="currentColor"/><circle cx="7.4" cy="7.5" r="0.7" fill="#fffef8"/><circle cx="10.6" cy="7.5" r="0.7" fill="#fffef8"/><path d="M6.4 10.2c.8.8 4.4.8 5.2 0" fill="none" stroke="#fffef8" stroke-width="1.1" stroke-linecap="round"/></svg>
+  <button class="cat-restore" id="cat-restore" type="button" hidden data-cat-icon="restore" data-label-hans="召回小猫" data-label-hant="召回小貓" aria-label="召回小猫" title="召回小猫">
+    <img alt="" width="28" height="28" decoding="async" referrerpolicy="no-referrer" />
   </button>
   <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
   <script>
     (function setupBlogCat() {
+      (function loadCatBarIcons() {
+        var icons = {
+          music: [
+            "https://api.iconify.design/fluent-emoji:musical-notes.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f3b5.png",
+            "https://api.iconify.design/twemoji:musical-notes.svg"
+          ],
+          quote: [
+            "https://api.iconify.design/fluent-emoji:speech-balloon.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4ac.png",
+            "https://api.iconify.design/twemoji:speech-balloon.svg"
+          ],
+          skin: [
+            "https://api.iconify.design/fluent-emoji:cat-face.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f431.png",
+            "https://api.iconify.design/twemoji:cat-face.svg"
+          ],
+          shot: [
+            "https://api.iconify.design/fluent-emoji:camera-with-flash.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4f8.png",
+            "https://api.iconify.design/twemoji:camera-with-flash.svg"
+          ],
+          hide: [
+            "https://api.iconify.design/fluent-emoji:see-no-evil-monkey.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f648.png",
+            "https://api.iconify.design/twemoji:see-no-evil-monkey.svg"
+          ],
+          restore: [
+            "https://api.iconify.design/fluent-emoji:cat.svg",
+            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f408.png",
+            "https://api.iconify.design/twemoji:cat.svg"
+          ]
+        };
+        document.querySelectorAll("[data-cat-icon]").forEach(function (btn) {
+          var img = btn.querySelector("img");
+          var sources = icons[btn.getAttribute("data-cat-icon")] || [];
+          if (!img || !sources.length) return;
+          var index = 0;
+          function tryNext() {
+            if (index >= sources.length) {
+              img.onerror = null;
+              img.onload = null;
+              return;
+            }
+            img.referrerPolicy = "no-referrer";
+            img.decoding = "async";
+            img.onload = function () {
+              img.onerror = null;
+              img.onload = null;
+            };
+            img.onerror = function () {
+              index += 1;
+              tryNext();
+            };
+            img.src = sources[index];
+          }
+          tryNext();
+        });
+      })();
+
       var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce) return;
       var catUi = document.getElementById("cat-ui");
@@ -8347,13 +9561,13 @@
             model: { jsonPath: modelPath, scale: 1 },
             display: {
               superSample: 2,
-              width: 170,
-              height: 300,
+              width: 200,
+              height: 350,
               position: "left",
-              hOffset: 56,
-              vOffset: 92
+              hOffset: 68,
+              vOffset: 88
             },
-            mobile: { show: true, scale: 0.55, motion: true },
+            mobile: { show: true, scale: 0.62, motion: true },
             name: { canvas: "live2dcanvas" },
             react: { opacityDefault: 0.92, opacityOnHover: 1 }
           });
