@@ -2,41 +2,21 @@
 
 独立站点目录。页面入口：`blank.html`
 
-## 文章（只用 JS）
+## 文章怎么存
 
-唯一数据源：`articles/articles-data.js`
+| 位置 | 作用 |
+|------|------|
+| 本机浏览器 `localStorage` | **增删改实际生效的地方** |
+| `articles/articles-data.js` | 首次打开时的种子；也可导出后上传到 GitHub |
 
-```js
-window.__BLANK_ARTICLES = [
-  {
-    "id": "a-opening",
-    "category": "随笔",
-    "date": "2026.10.04",
-    "title": "开篇",
-    "body": "正文…"
-  }
-];
-```
+GitHub Pages 是静态站，浏览器**不能直接改仓库里的 JS**。所以：
 
-页面启动会：
-1. 读取本地 `articles-data.js`
-2. 再尝试从 GitHub 同路径拉取覆盖
+1. 后台添加 / 修改 / 删除 → 立刻保存在本机，刷新也还在  
+2. 若要更新线上种子文件：存档页点「导出 articles-data.js」，再上传到仓库  
+   或填写有写权限的 GitHub Token 后点「推送到 GitHub JS」  
+   或「绑定本地 articles 文件夹」后保存会自动写本机文件
 
-默认 GitHub 路径：`catcoder-0/1` → `blank/articles/articles-data.js`
-
-### 后台自动改 JS
-
-1. 「后台管理 → 存档」配置仓库 / 分支 / 路径
-2. 填 GitHub Token（写权限）或「绑定本地 articles 文件夹」
-3. 添加 / 修改 / 删除文章后，会自动改写 `articles-data.js`
-
-没有 Token / 未绑定文件夹时，会下载更新后的 `articles-data.js`。
-
-### 规范化（可选）
-
-```bash
-python crawl-articles.py
-```
+「用 GitHub JS 覆盖本机」会用仓库文件盖掉当前浏览器里的文章，请慎用。
 
 ## 本地预览
 

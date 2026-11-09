@@ -5201,7 +5201,7 @@
                 <button class="board-action is-ghost" id="admin-sync-import" type="button" data-hans="导入本地文件" data-hant="匯入本機檔案">导入本地文件</button>
                 <input id="admin-sync-file" type="file" accept="application/json,.json" hidden />
               </div>
-              <p class="admin-hint" style="margin:12px 0 0;text-align:left" data-hans="文章只存 articles-data.js：后台保存/删除会自动改写这个 JS 文件。" data-hant="文章只存 articles-data.js：後台保存/刪除會自動改寫這個 JS 檔。">文章只存 articles-data.js：后台保存/删除会自动改写这个 JS 文件。</p>
+              <p class="admin-hint" style="margin:12px 0 0;text-align:left" data-hans="文章增删改保存在本机浏览器。GitHub 上的 JS 静态站不能直接改；可导出 JS 后手动上传，或填 Token / 绑定本地文件夹自动写入。" data-hant="文章增刪改保存在本機瀏覽器。GitHub 上的 JS 靜態站不能直接改；可匯出 JS 後手動上傳，或填 Token / 綁定本機資料夾自動寫入。">文章增删改保存在本机浏览器。GitHub 上的 JS 静态站不能直接改；可导出 JS 后手动上传，或填 Token / 绑定本地文件夹自动写入。</p>
               <div class="admin-sync-row">
                 <input class="admin-sync-id" id="admin-gh-repo" spellcheck="false" data-ph-hans="仓库：catcoder-0/1" data-ph-hant="倉庫：catcoder-0/1" placeholder="仓库：catcoder-0/1" />
               </div>
@@ -5215,7 +5215,11 @@
               </div>
               <div class="admin-sync-row">
                 <button class="board-action is-ghost" id="admin-gh-pick-dir" type="button" data-hans="绑定本地 articles 文件夹" data-hant="綁定本機 articles 資料夾">绑定本地 articles 文件夹</button>
-                <button class="board-action is-ghost" id="admin-gh-pull" type="button" data-hans="从 GitHub 拉 JS" data-hant="從 GitHub 拉 JS">从 GitHub 拉 JS</button>
+                <button class="board-action is-ghost" id="admin-gh-export" type="button" data-hans="导出 articles-data.js" data-hant="匯出 articles-data.js">导出 articles-data.js</button>
+              </div>
+              <div class="admin-sync-row">
+                <button class="board-action is-ghost" id="admin-gh-pull" type="button" data-hans="用 GitHub JS 覆盖本机" data-hant="用 GitHub JS 覆蓋本機">用 GitHub JS 覆盖本机</button>
+                <button class="board-action is-ghost" id="admin-gh-push" type="button" data-hans="推送到 GitHub JS" data-hant="推送到 GitHub JS">推送到 GitHub JS</button>
               </div>
               <p class="admin-sync-status" id="admin-sync-status" aria-live="polite"></p>
             </div>
@@ -6523,35 +6527,52 @@
         try { wroteLocal = await writeLocalArticlesFile(ARTICLES_JS_NAME, dataJs); } catch (error) { wroteLocal = false; }
 
         var wroteGithub = false;
-        if (cfg.token) {
-          var basePath = String(cfg.path || GH_DEFAULT.path).replace(/^\/+|\/+$/g, "");
-          await githubPutFile(
-            cfg,
-            basePath + "/" + ARTICLES_JS_NAME,
-            dataJs,
-            "docs: update " + ARTICLES_JS_NAME
-          );
-          wroteGithub = true;
+        var githubError = "";
+        if (cfg.token && !options.skipGithub) {
+          try {
+            var basePath = String(cfg.path || GH_DEFAULT.path).replace(/^\/+|\/+$/g, "");
+            await githubPutFile(
+              cfg,
+              basePath + "/" + ARTICLES_JS_NAME,
+              dataJs,
+              "docs: update " + ARTICLES_JS_NAME
+            );
+            wroteGithub = true;
+          } catch (error) {
+            githubError = String((error && error.message) || error || "github-failed");
+          }
         }
 
-        if (!wroteGithub && !wroteLocal && !options.skipDownload) {
+        // Only download when explicitly requested (export), not on every save.
+        if (!wroteGithub && !wroteLocal && options.forceDownload) {
           downloadTextFile(ARTICLES_JS_NAME, dataJs);
         }
 
-        return { wroteGithub: wroteGithub, wroteLocal: wroteLocal, dataJs: dataJs };
+        return {
+          wroteGithub: wroteGithub,
+          wroteLocal: wroteLocal,
+          downloaded: !wroteGithub && !wroteLocal && !!options.forceDownload,
+          githubError: githubError,
+          dataJs: dataJs
+        };
       }
 
-      function crawlArticlesJs() {
-        applyEmbeddedArticles({ silent: true });
+      function crawlArticlesJs(options) {
+        options = options || {};
+        // Default: never overwrite local edits. Only seed / explicit pull.
+        if (!options.force) {
+          return Promise.resolve(articles || []);
+        }
         var bases = githubArticlesBases();
         return fetchFirstOk(bases.map(function (base) { return base + ARTICLES_JS_NAME; }), { cache: "no-store" })
           .then(function (response) { return response.text(); })
           .then(function (text) {
             var list = parseArticlesDataJs(text);
-            if (list.length) applyArticlesList(list, { silent: true });
+            if (list.length) applyArticlesList(list, { silent: !!options.silent });
             return list;
           })
           .catch(function () {
+            if (options.allowEmbedded) applyEmbeddedArticles({ silent: true });
             return readEmbeddedArticles();
           });
       }
@@ -6559,7 +6580,10 @@
       window.__crawlArticlesJs = crawlArticlesJs;
       window.__persistArticlesJs = persistArticlesJs;
       window.__applyArticlesJs = function (options) {
-        return applyEmbeddedArticles(options || { silent: true });
+        // Do not wipe localStorage working copy unless forced.
+        options = options || { silent: true };
+        if (options.force) return applyEmbeddedArticles(options);
+        return false;
       };
       window.__loadGithubArticlesConfig = loadGithubArticlesConfig;
       window.__saveGithubArticlesConfig = saveGithubArticlesConfig;
@@ -6958,13 +6982,15 @@
       }
 
       articles = loadArticles();
-      applyEmbeddedArticles({ silent: true, skipSave: false });
+      // JS file is only a seed when this browser has no saved articles yet.
+      if (!articles.length) {
+        applyEmbeddedArticles({ silent: true, skipSave: false });
+      }
       if (!localStorage.getItem(ARTICLE_KEY)) {
         try { localStorage.setItem(ARTICLE_KEY, JSON.stringify(articles)); } catch (error) {}
       }
       renderArticles();
       syncFromHash();
-      crawlArticlesJs();
 
       window.__openArticleEditor = openEditor;
       window.__refreshArticles = renderArticles;
@@ -7015,20 +7041,12 @@
         renderArticles();
         closeEditor();
         if (typeof window.__renderAdminArticles === "function") window.__renderAdminArticles();
-
-        persistArticlesJs().then(function (result) {
-          var hant = root.dataset.script === "hant";
-          if (result.wroteGithub) {
-            showArticlesToast(hant ? "已寫入 articles-data.js" : "已写入 articles-data.js");
-          } else if (result.wroteLocal) {
-            showArticlesToast(hant ? "已寫入本地 JS" : "已写入本地 JS");
-          } else {
-            showArticlesToast(hant ? "已下載 articles-data.js" : "已下载 articles-data.js");
-          }
-        }).catch(function () {
-          downloadTextFile(ARTICLES_JS_NAME, buildArticlesDataJs(articles));
-          showArticlesToast(root.dataset.script === "hant" ? "已下載 JS 備用" : "已下载 JS 备用");
-        });
+        showArticlesToast(root.dataset.script === "hant" ? "已保存到本機" : "已保存到本机");
+        // Best-effort write JS only when Token / local folder is ready.
+        persistArticlesJs({ skipGithub: false }).then(function (result) {
+          if (result.wroteGithub) showArticlesToast(root.dataset.script === "hant" ? "已同步到 GitHub JS" : "已同步到 GitHub JS");
+          else if (result.wroteLocal) showArticlesToast(root.dataset.script === "hant" ? "已寫入本地 JS" : "已写入本地 JS");
+        }).catch(function () {});
 
         if (document.body.classList.contains("admin-open")) {
           return;
@@ -7047,11 +7065,12 @@
         if (document.body.classList.contains("article-open")) closeReader(false);
         renderArticles();
         if (typeof window.__renderAdminArticles === "function") window.__renderAdminArticles();
-        persistArticlesJs({ skipDownload: false }).then(function () {
-          showArticlesToast(hant ? "已更新 articles-data.js" : "已更新 articles-data.js");
-        }).catch(function () {
-          downloadTextFile(ARTICLES_JS_NAME, buildArticlesDataJs(articles));
-        });
+        showArticlesToast(hant ? "已刪除（本機）" : "已删除（本机）");
+        persistArticlesJs().then(function (result) {
+          if (result.wroteGithub || result.wroteLocal) {
+            showArticlesToast(hant ? "已同步 JS" : "已同步 JS");
+          }
+        }).catch(function () {});
       });
 
       if (sideTags) {
@@ -8449,12 +8468,11 @@
             if (typeof buildArticlesDataJs === "function") buildArticlesDataJs(articles);
             if (window.__refreshArticles) window.__refreshArticles();
             renderAdminArticles();
+            if (typeof window.__showArticlesToast === "function") {
+              window.__showArticlesToast(hant ? "已刪除（本機）" : "已删除（本机）");
+            }
             if (typeof window.__persistArticlesJs === "function") {
-              window.__persistArticlesJs().then(function () {
-                if (typeof window.__showArticlesToast === "function") {
-                  window.__showArticlesToast(hant ? "已更新 articles-data.js" : "已更新 articles-data.js");
-                }
-              }).catch(function () {});
+              window.__persistArticlesJs().catch(function () {});
             }
           }
         });
@@ -8630,14 +8648,9 @@
               articles = snapshot.articles.filter(function (item) {
                 return item && item.id && item.title;
               });
-              // Prefer articles-data.js over archive snapshot.
-              if (typeof window.__applyArticlesJs === "function") {
-                window.__applyArticlesJs({ silent: true });
-              } else {
-                try { localStorage.setItem(ARTICLE_KEY_SYNC, JSON.stringify(articles)); } catch (error) {}
-                if (typeof renderArticles === "function") renderArticles();
-                if (typeof window.__renderAdminArticles === "function") window.__renderAdminArticles();
-              }
+              try { localStorage.setItem(ARTICLE_KEY_SYNC, JSON.stringify(articles)); } catch (error) {}
+              if (typeof renderArticles === "function") renderArticles();
+              if (typeof window.__renderAdminArticles === "function") window.__renderAdminArticles();
             }
             if (Array.isArray(snapshot.guestbook)) {
               try { localStorage.setItem(GUESTBOOK_KEY_SYNC, JSON.stringify(snapshot.guestbook)); } catch (error) {}
@@ -8911,7 +8924,9 @@
         var ghTokenInput = document.getElementById("admin-gh-token");
         var ghSaveBtn = document.getElementById("admin-gh-save");
         var ghPickBtn = document.getElementById("admin-gh-pick-dir");
+        var ghExportBtn = document.getElementById("admin-gh-export");
         var ghPullBtn = document.getElementById("admin-gh-pull");
+        var ghPushBtn = document.getElementById("admin-gh-push");
 
         function fillGithubForm() {
           if (typeof window.__loadGithubArticlesConfig !== "function") return;
@@ -8964,22 +8979,64 @@
           });
         }
 
+        if (ghExportBtn) {
+          ghExportBtn.addEventListener("click", function () {
+            if (typeof window.__persistArticlesJs !== "function") return;
+            window.__persistArticlesJs({ forceDownload: true, skipGithub: true }).then(function () {
+              setStatus(hantMode() ? "已匯出 articles-data.js" : "已导出 articles-data.js", "ok");
+            }).catch(function () {
+              setStatus(hantMode() ? "匯出失敗" : "导出失败", "err");
+            });
+          });
+        }
+
         if (ghPullBtn) {
           ghPullBtn.addEventListener("click", function () {
+            var ok = window.confirm(hantMode()
+              ? "用 GitHub 的 articles-data.js 覆蓋本機文章？"
+              : "用 GitHub 的 articles-data.js 覆盖本机文章？");
+            if (!ok) return;
             var cfg = readGithubForm();
             if (typeof window.__saveGithubArticlesConfig === "function") {
               window.__saveGithubArticlesConfig(cfg);
             }
             if (typeof window.__crawlArticlesJs !== "function") return;
             setStatus(hantMode() ? "正在從 GitHub 拉取 JS…" : "正在从 GitHub 拉取 JS…", "");
-            window.__crawlArticlesJs().then(function (list) {
+            window.__crawlArticlesJs({ force: true, silent: true, allowEmbedded: true }).then(function (list) {
               var n = Array.isArray(list) ? list.length : 0;
               setStatus(
-                hantMode() ? ("已載入 " + n + " 篇文章") : ("已加载 " + n + " 篇文章"),
+                hantMode() ? ("已覆蓋為 " + n + " 篇文章") : ("已覆盖为 " + n + " 篇文章"),
                 n ? "ok" : "err"
               );
             }).catch(function () {
               setStatus(hantMode() ? "拉取失敗" : "拉取失败", "err");
+            });
+          });
+        }
+
+        if (ghPushBtn) {
+          ghPushBtn.addEventListener("click", function () {
+            var cfg = readGithubForm();
+            if (typeof window.__saveGithubArticlesConfig === "function") {
+              window.__saveGithubArticlesConfig(cfg);
+            }
+            if (!cfg.token) {
+              setStatus(hantMode() ? "請先填寫 GitHub Token" : "请先填写 GitHub Token", "err");
+              return;
+            }
+            if (typeof window.__persistArticlesJs !== "function") return;
+            setStatus(hantMode() ? "正在推送到 GitHub…" : "正在推送到 GitHub…", "");
+            window.__persistArticlesJs({ skipGithub: false }).then(function (result) {
+              if (result.wroteGithub) {
+                setStatus(hantMode() ? "已推送到 GitHub JS" : "已推送到 GitHub JS", "ok");
+              } else {
+                setStatus(
+                  (hantMode() ? "推送失敗：" : "推送失败：") + (result.githubError || "unknown"),
+                  "err"
+                );
+              }
+            }).catch(function (error) {
+              setStatus((hantMode() ? "推送失敗：" : "推送失败：") + String(error && error.message || error), "err");
             });
           });
         }
