@@ -1,10 +1,63 @@
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="light" data-script="hans">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta name="format-detection" content="telephone=no,email=no,address=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title data-hans="空白页" data-hant="空白頁">空白页</title>
   <script>
+    (function () {
+      var DESIGN = 1200;
+      var meta = document.querySelector('meta[name="viewport"]');
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("name", "viewport");
+        document.head.appendChild(meta);
+      }
+      function isLandscape() {
+        if (typeof window.orientation === "number") return Math.abs(window.orientation) === 90;
+        try {
+          if (window.matchMedia && window.matchMedia("(orientation: landscape)").matches) return true;
+        } catch (error) {}
+        return (window.innerWidth || 0) > (window.innerHeight || 0);
+      }
+      function cssScreenW() {
+        var sw = Number(window.screen && window.screen.width) || 0;
+        var sh = Number(window.screen && window.screen.height) || 0;
+        var min = Math.min(sw, sh);
+        var max = Math.max(sw, sh);
+        if (!min && !max) return DESIGN;
+        return isLandscape() ? (max || min) : (min || max);
+      }
+      function applyViewport() {
+        var width = cssScreenW();
+        if (width >= DESIGN) {
+          meta.setAttribute("content", "width=device-width, initial-scale=1, viewport-fit=cover");
+          return;
+        }
+        var scale = width / DESIGN;
+        if (!(scale > 0)) scale = 1;
+        if (scale < 0.15) scale = 0.15;
+        meta.setAttribute(
+          "content",
+          "width=" + DESIGN +
+            ", initial-scale=" + scale.toFixed(5) +
+            ", minimum-scale=" + Math.max(0.15, scale * 0.5).toFixed(5) +
+            ", maximum-scale=4, user-scalable=yes, viewport-fit=cover"
+        );
+      }
+      applyViewport();
+      window.addEventListener("orientationchange", function () {
+        window.setTimeout(applyViewport, 120);
+      });
+    })();
     try {
       var savedTheme = localStorage.getItem("blank-theme");
       var savedScript = localStorage.getItem("blank-script");
@@ -141,9 +194,15 @@
 
     html {
       scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     html, body { margin: 0; min-height: 100%; }
+
+    a, button, input, textarea, select {
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       --gaze-x: 50%;
@@ -2007,37 +2066,55 @@
 
     @media (max-width: 860px) {
       .stage {
-        padding: 118px 24px 140px;
+        padding: 96px 48px 120px 40px;
       }
 
       .topbar {
-        width: 100%;
         min-height: 54px;
-        padding: 6px 10px;
-        border-radius: 0;
-        justify-content: flex-start;
+        padding: 6px 18px;
       }
 
       .topbar-brand {
+        left: 16px;
+      }
+
+      .topbar-brand span {
         display: none;
       }
 
-      .topbar-nav {
-        margin: 0;
-        max-width: 100%;
-      }
-
-      .topbar-link {
-        padding: 5px 10px 5px 6px;
-        font-size: 12px;
-      }
-
       .board {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        gap: 16px;
+      }
+    }
+
+    @media (max-height: 640px) {
+      .stage {
+        padding: 76px 48px 96px 40px;
+        gap: 16px;
       }
 
-      .board-side {
-        order: 2;
+      .topbar,
+      .topbar.is-compact {
+        min-height: 48px;
+        padding: 4px 18px;
+      }
+
+      .weather {
+        top: 56px;
+      }
+
+      .dock {
+        bottom: 72px;
+        gap: 10px;
+        transform: scale(0.86);
+        transform-origin: right bottom;
+      }
+
+      .ios-dock {
+        bottom: 8px;
+        transform: translateX(-50%) scale(0.88);
+        transform-origin: center bottom;
       }
     }
 
