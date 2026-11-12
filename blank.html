@@ -5073,10 +5073,6 @@
         <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
         <span data-hans="留言板" data-hant="留言板">留言板</span>
       </button>
-      <button class="topbar-link" type="button" data-nav="admin" data-top-icon="admin" id="topbar-admin">
-        <img alt="" width="22" height="22" decoding="async" referrerpolicy="no-referrer" />
-        <span id="topbar-admin-label" data-hans="登录 GitHub" data-hant="登錄 GitHub">登录 GitHub</span>
-      </button>
     </nav>
   </header>
   <div class="cursor-dust" id="cursor-dust" aria-hidden="true"></div>
@@ -5092,7 +5088,7 @@
         <header class="board-head">
           <h1 class="board-title" data-hans="我的专栏" data-hant="我的專欄">我的专栏</h1>
         </header>
-        <p class="board-hint" data-hans="点击文章进入阅读页。文章只随同目录 articles-data.js 更新；发言请先登录 GitHub，昵称不可伪装。" data-hant="點擊文章進入閱讀頁。文章只隨同目錄 articles-data.js 更新；發言請先登錄 GitHub，暱稱不可偽裝。">点击文章进入阅读页。文章只随同目录 articles-data.js 更新；发言请先登录 GitHub，昵称不可伪装。</p>
+        <p class="board-hint" data-hans="点击文章进入阅读页。文章只随同目录 articles-data.js 更新。" data-hant="點擊文章進入閱讀頁。文章只隨同目錄 articles-data.js 更新。">点击文章进入阅读页。文章只随同目录 articles-data.js 更新。</p>
         <ul class="article-list" id="article-list"></ul>
       </section>
       <aside class="board-side" aria-label="侧边栏" data-label-hans="侧边栏" data-label-hant="側邊欄">
@@ -5330,50 +5326,6 @@
       </div>
     </section>
 
-    <section class="admin-page" id="admin-page" aria-hidden="true" aria-label="登录 GitHub">
-      <div class="admin-shell">
-        <div class="admin-gate is-on" id="admin-gate">
-          <h1 class="admin-title" data-hans="登录 GitHub" data-hant="登錄 GitHub">登录 GitHub</h1>
-          <p class="admin-hint" data-hans="输入 GitHub 用户名即可登录，头像和资料会自动读取。留言请在留言板用 Giscus 的 GitHub 登录。文章只读取同目录的 articles-data.js。" data-hant="輸入 GitHub 用戶名即可登錄，頭像和資料會自動讀取。留言請在留言板用 Giscus 的 GitHub 登錄。文章只讀取同目錄的 articles-data.js。">输入 GitHub 用户名即可登录，头像和资料会自动读取。留言请在留言板用 Giscus 的 GitHub 登录。文章只读取同目录的 articles-data.js。</p>
-          <form class="admin-login-form" id="admin-login-form">
-            <label>
-              <span data-hans="GitHub 用户名" data-hant="GitHub 用戶名">GitHub 用户名</span>
-              <input id="admin-gh-login-name" name="login" type="text" autocomplete="username" spellcheck="false" required data-ph-hans="例如 catcoder-0" data-ph-hant="例如 catcoder-0" placeholder="例如 catcoder-0" />
-            </label>
-            <p class="admin-hint" style="margin:0;text-align:left" data-hans="填写公开的 GitHub 用户名，不用 Token。文章请直接修改同目录 articles-data.js。" data-hant="填寫公開的 GitHub 用戶名，不用 Token。文章請直接修改同目錄 articles-data.js。">填写公开的 GitHub 用户名，不用 Token。文章请直接修改同目录 articles-data.js。</p>
-            <p class="admin-login-error" id="admin-login-error" aria-live="polite"></p>
-            <div class="admin-login-actions">
-              <button class="board-action" type="submit" data-hans="登录 GitHub" data-hant="登錄 GitHub">登录 GitHub</button>
-            </div>
-          </form>
-        </div>
-        <div class="admin-workspace" id="admin-workspace">
-          <div class="admin-head-bar">
-            <h1 class="admin-title" id="admin-workspace-title" data-hans="GitHub 账号" data-hant="GitHub 賬號">GitHub 账号</h1>
-            <button class="board-action is-ghost" id="admin-logout" type="button" data-hans="退出登录" data-hant="退出登錄">退出登录</button>
-          </div>
-          <div class="admin-gh-card" id="admin-gh-card">
-            <img id="admin-gh-avatar" alt="" width="48" height="48" />
-            <div>
-              <strong id="admin-gh-login"></strong>
-              <p id="admin-gh-role"></p>
-            </div>
-          </div>
-          <div class="admin-visitor" id="admin-visitor">
-            <p class="admin-hint" style="text-align:left" data-hans="你已登录。留言请到留言板，用 Giscus 的 GitHub 账号发言，全网同步。文章随 articles-data.js 更新，友链随 links-data.js 更新。" data-hant="你已登錄。留言請到留言板，用 Giscus 的 GitHub 賬號發言，全網同步。文章隨 articles-data.js 更新，友鏈隨 links-data.js 更新。">你已登录。留言请到留言板，用 Giscus 的 GitHub 账号发言，全网同步。文章随 articles-data.js 更新，友链随 links-data.js 更新。</p>
-            <div class="admin-login-actions" style="justify-content:flex-start">
-              <button class="board-action" type="button" data-nav="guestbook" data-hans="去留言板" data-hant="去留言板">去留言板</button>
-            </div>
-          </div>
-          <div class="admin-owner-tools" id="admin-owner-tools">
-          <p class="admin-hint" data-hans="文章只读取同目录 articles-data.js。友链只读取 links-data.js。留言使用 Giscus，请改 comments-config.js 并在仓库打开 Discussions。" data-hant="文章只讀取同目錄 articles-data.js。友鏈只讀取 links-data.js。留言使用 Giscus，請改 comments-config.js 並在倉庫打開 Discussions。">文章只读取同目录 articles-data.js。友链只读取 links-data.js。留言使用 Giscus，请改 comments-config.js 并在仓库打开 Discussions。</p>
-          <div class="admin-panel is-active" data-admin-panel="links">
-            <ul class="admin-list" id="admin-link-list"></ul>
-          </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="guestbook-page" id="guestbook-page" aria-hidden="true" aria-label="留言板">
       <div class="guestbook-shell">
@@ -7523,11 +7475,6 @@
             "https://api.iconify.design/fluent-emoji:speech-balloon.svg",
             "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4ac.png",
             "https://api.iconify.design/twemoji:speech-balloon.svg"
-          ],
-          admin: [
-            "https://api.iconify.design/fluent-emoji:laptop.svg",
-            "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4bb.png",
-            "https://api.iconify.design/twemoji:laptop.svg"
           ]
         };
 
@@ -8191,140 +8138,12 @@
       })();
 
       (function setupAdminPage() {
-        var adminPage = document.getElementById("admin-page");
-        var adminGate = document.getElementById("admin-gate");
-        var adminWorkspace = document.getElementById("admin-workspace");
-        var loginForm = document.getElementById("admin-login-form");
-        var tokenInput = document.getElementById("admin-gh-login-name");
-        var loginError = document.getElementById("admin-login-error");
-        var logoutBtn = document.getElementById("admin-logout");
-        var linkListEl = document.getElementById("admin-link-list");
-        if (!adminPage || !adminGate || !adminWorkspace || !loginForm) return;
-
-        function isUnlocked() {
-          return typeof window.__isGithubOwner === "function" && !!window.__isGithubOwner();
-        }
-
-        function showLoginError(text) {
-          if (!loginError) return;
-          loginError.textContent = text || "";
-        }
-
-        function syncAdminView(options) {
-          options = options || {};
-          var user = typeof window.__loadGithubUser === "function" ? window.__loadGithubUser() : null;
-          var loggedIn = !!(user && user.login);
-          var owner = typeof window.__isGithubOwner === "function" && window.__isGithubOwner(user);
-          adminGate.classList.toggle("is-on", !loggedIn);
-          adminWorkspace.classList.toggle("is-on", loggedIn);
-          var visitor = document.getElementById("admin-visitor");
-          var tools = document.getElementById("admin-owner-tools");
-          if (visitor) visitor.classList.toggle("is-on", loggedIn && !owner);
-          if (tools) tools.classList.toggle("is-on", loggedIn && owner);
-          if (typeof window.__syncGithubIdentity === "function") window.__syncGithubIdentity();
-          if (loggedIn && owner) {
-            renderAdminLinks();
-          }
-          if (!loggedIn && tokenInput && !options.keepError) {
-            tokenInput.value = "";
-            window.setTimeout(function () { tokenInput.focus(); }, 40);
-          }
-          if (!options.keepError) showLoginError("");
-        }
-
-        function renderAdminLinks() {
-          if (!linkListEl) return;
-          if (!friendLinks.length) {
-            linkListEl.innerHTML = '<li class="admin-empty" data-hans="还没有友链，请编辑 links-data.js" data-hant="還沒有友鏈，請編輯 links-data.js">还没有友链，请编辑 links-data.js</li>';
-            return;
-          }
-          linkListEl.innerHTML = friendLinks.map(function (item) {
-            return (
-              '<li class="admin-item" data-admin-link="' + escapeHtml(item.id) + '">' +
-                '<div class="admin-item-main">' +
-                  '<p class="admin-item-title">' + escapeHtml(item.name) + "</p>" +
-                  '<p class="admin-item-meta">' + escapeHtml(item.url) + (item.intro ? " · " + item.intro : "") + "</p>" +
-                "</div>" +
-              "</li>"
-            );
-          }).join("");
-          if (typeof applyCopy === "function") applyCopy(root.dataset.script || "hans");
-        }
-
-        function closeAdmin() {
-          adminPage.classList.remove("is-open");
-          adminPage.setAttribute("aria-hidden", "true");
+        window.__openAdminPage = function () {};
+        window.__closeAdminPage = function () {
           document.body.classList.remove("admin-open");
-          if (tokenInput) tokenInput.value = "";
-          showLoginError("");
-        }
-
-        function openAdmin(options) {
-          options = options || {};
-          if (document.body.classList.contains("article-open")) {
-            var back = document.getElementById("article-back");
-            if (back) back.click();
-          }
-          if (window.__closeAboutPage) window.__closeAboutPage();
-          if (window.__closePostsPage) window.__closePostsPage();
-          if (window.__closeTagsPage) window.__closeTagsPage();
-          if (window.__closeLinksPage) window.__closeLinksPage();
-          if (window.__closeGuestbookPage) window.__closeGuestbookPage();
-          setWeatherOpen(false);
-          adminPage.classList.add("is-open");
-          adminPage.setAttribute("aria-hidden", "false");
-          document.body.classList.add("admin-open");
-          syncAdminView(options);
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          if (window.__syncReadProgress) window.__syncReadProgress();
-        }
-
-        renderAdminLinks();
-        if (typeof window.__renderFriendLinks === "function") window.__renderFriendLinks();
-        if (typeof window.__syncGithubIdentity === "function") window.__syncGithubIdentity();
-
-        loginForm.addEventListener("submit", function (event) {
-          event.preventDefault();
-          var hant = root.dataset.script === "hant";
-          var login = ((tokenInput && tokenInput.value) || "").trim().replace(/^@/, "");
-          if (!login) {
-            showLoginError(hant ? "請輸入 GitHub 用戶名" : "请输入 GitHub 用户名");
-            return;
-          }
-          if (typeof window.__fetchGithubUser !== "function") return;
-          showLoginError(hant ? "正在讀取資料…" : "正在读取资料…");
-          window.__fetchGithubUser(login).then(function (user) {
-            if (typeof window.__saveGithubUser === "function") window.__saveGithubUser(user);
-            if (tokenInput) tokenInput.value = "";
-            syncAdminView();
-          }).catch(function (error) {
-            if (typeof window.__saveGithubUser === "function") window.__saveGithubUser(null);
-            syncAdminView({ keepError: true });
-            showLoginError(
-              error && error.code === "not-found"
-                ? (hant ? "找不到這個 GitHub 用戶" : "找不到这个 GitHub 用户")
-                : error && error.code === "bad-login"
-                  ? (hant ? "用戶名格式不對" : "用户名格式不对")
-                : (hant ? "無法連接 GitHub，請檢查網絡" : "无法连接 GitHub，请检查网络")
-            );
-          });
-        });
-
-        if (logoutBtn) {
-          logoutBtn.addEventListener("click", function () {
-            if (typeof window.__saveGithubUser === "function") window.__saveGithubUser(null);
-            syncAdminView();
-          });
-        }
-
-        window.__openAdminPage = openAdmin;
-        window.__closeAdminPage = closeAdmin;
-        window.__isAdminUnlocked = isUnlocked;
-        window.__renderAdminLinks = renderAdminLinks;
-        window.__applyFriendLinks = function (list) {
-          applyLinksList(list);
-          renderAdminLinks();
         };
+        window.__isAdminUnlocked = function () { return false; };
+        window.__renderAdminLinks = function () {};
       })();
 
       (function setupGithubPublish() {
@@ -8387,7 +8206,7 @@
           if (document.body.classList.contains("admin-open") && nav !== "admin") {
             if (window.__closeAdminPage) window.__closeAdminPage();
           }
-          if (document.body.classList.contains("article-open") && nav !== "about" && nav !== "articles" && nav !== "tags" && nav !== "links" && nav !== "guestbook" && nav !== "admin") {
+          if (document.body.classList.contains("article-open") && nav !== "about" && nav !== "articles" && nav !== "tags" && nav !== "links" && nav !== "guestbook") {
             var back = document.getElementById("article-back");
             if (back) back.click();
           }
@@ -8403,8 +8222,6 @@
             if (window.__openLinksPage) window.__openLinksPage();
           } else if (nav === "guestbook") {
             if (window.__openGuestbookPage) window.__openGuestbookPage();
-          } else if (nav === "admin") {
-            if (window.__openAdminPage) window.__openAdminPage();
           } else {
             showToast(hant ? "頁面籌備中" : "页面筹备中");
           }
@@ -8725,8 +8542,7 @@
           articles: function () { return body.classList.contains("posts-open") || body.classList.contains("article-open"); },
           tags: function () { return body.classList.contains("tags-open"); },
           links: function () { return body.classList.contains("links-open"); },
-          guestbook: function () { return body.classList.contains("guestbook-open"); },
-          admin: function () { return body.classList.contains("admin-open"); }
+          guestbook: function () { return body.classList.contains("guestbook-open"); }
         };
 
         function syncNav() {
